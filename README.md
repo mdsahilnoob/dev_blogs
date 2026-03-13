@@ -15,6 +15,12 @@ Features:
 - ✅ RSS Feed support
 - ✅ Markdown & MDX support
 
+V1 upcoming features:
+- Blog content, for all types of tech content
+- Image hosting cloudflare R2
+- Dark mode
+
+
 ## 🚀 Project Structure
 
 Inside of your Astro project, you'll see the following folders and files:
