@@ -1,121 +1,72 @@
----
+﻿---
 export const prerender = true;
 
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import BaseHead from "../../components/BaseHead.astro";
+import BlogSidebar from "../../components/BlogSidebar.astro";
 import Footer from "../../components/Footer.astro";
-import FormattedDate from "../../components/FormattedDate.astro";
-import Header from "../../components/Header.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 
-const posts = (await getCollection("blog")).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const posts = (await getCollection("blog"))
+  .filter((entry) => !entry.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-    <style>
-      main {
-        width: 960px;
-      }
-      ul {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-      ul li {
-        width: calc(50% - 1rem);
-      }
-      ul li * {
-        text-decoration: none;
-        transition: 0.2s ease;
-      }
-      ul li:first-child {
-        width: 100%;
-        margin-bottom: 1rem;
-        text-align: center;
-      }
-      ul li:first-child img {
-        width: 100%;
-      }
-      ul li:first-child .title {
-        font-size: 2.369rem;
-      }
-      ul li img {
-        margin-bottom: 0.5rem;
-        border-radius: 12px;
-      }
-      ul li a {
-        display: block;
-      }
-      .title {
-        margin: 0;
-        color: rgb(var(--black));
-        line-height: 1;
-      }
-      .date {
-        margin: 0;
-        color: rgb(var(--gray));
-      }
-      ul li a:hover h4,
-      ul li a:hover .date {
-        color: rgb(var(--accent));
-      }
-      ul a:hover img {
-        box-shadow: var(--box-shadow);
-      }
-      @media (max-width: 720px) {
-        ul {
-          gap: 0.5em;
-        }
-        ul li {
-          width: 100%;
-          text-align: center;
-        }
-        ul li:first-child {
-          margin-bottom: 0;
-        }
-        ul li:first-child .title {
-          font-size: 1.563em;
-        }
-      }
-    </style>
+    <BaseHead title={`Reports | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
   </head>
   <body>
-    <Header />
     <main>
-      <section>
-        <ul>
-          {
-            posts.map((post) => (
-              <li>
-                <a href={`/blog/${post.id}/`}>
-                  {post.data.heroImage && (
-                    <Image
-                      width={720}
-                      height={360}
-                      src={post.data.heroImage}
-                      alt=""
-                    />
-                  )}
-                  <h4 class="title">{post.data.title}</h4>
-                  <p class="date">
-                    <FormattedDate date={post.data.pubDate} />
-                  </p>
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
+      <div class="container blog-page-layout">
+        <BlogSidebar />
+
+        <section class="blog-main">
+          <section class="page-head">
+            <p class="section-kicker">Newsroom Archive</p>
+            <h1 class="page-title">Latest SaaS Reports</h1>
+            <p class="page-sub">Deep analysis on product strategy, engineering systems, pricing, and go-to-market execution.</p>
+          </section>
+
+          <section class="post-grid">
+            {
+              posts.length === 0 ? (
+                <article class="post-card">
+                  <div class="post-body">
+                    <h2 class="post-title">No articles published yet</h2>
+                  </div>
+                </article>
+              ) : (
+                posts.map((post) => (
+                  <article class="post-card">
+                    {post.data.heroImage && (
+                      <a href={`/blog/${post.id}/`}>
+                        <Image width={720} height={360} src={post.data.heroImage} alt={`Cover image for ${post.data.title}`} loading="lazy" />
+                      </a>
+                    )}
+                    <div class="post-body">
+                      <p class="card-meta">
+                        {(post.data.category ?? "Engineering").toUpperCase()} | {post.data.pubDate.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                      <h2 class="post-title">{post.data.title}</h2>
+                      <p>{post.data.description}</p>
+                      <a class="post-link" href={`/blog/${post.id}/`}>Read Report</a>
+                    </div>
+                  </article>
+                ))
+              )
+            }
+          </section>
+        </section>
+      </div>
     </main>
+
     <Footer />
   </body>
 </html>

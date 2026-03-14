@@ -1,0 +1,71 @@
+﻿---
+const groups = [
+  {
+    label: "Sections",
+    items: [
+      "Introduction",
+      "Components",
+    ],
+  },
+  {
+    label: "Components",
+    items: [
+      "Accordion",
+      "Alert",
+      "Avatar",
+      "Badge",
+      "Button",
+      "Card",
+      "Chart",
+      "Dialog",
+      "Input",
+      "Pagination",
+      "Sidebar",
+      "Table",
+      "Tabs",
+      "Tooltip",
+      "Typography",
+    ],
+  },
+  {
+    label: "Resources",
+    items: ["Blocks", "Charts", "Directory", "Registry", "MCP Server", "Open in v0"],
+  },
+];
+---
+
+<aside class="blog-sidebar" aria-label="Blog sidebar">
+  <div class="sidebar-shell">
+    <div class="sidebar-header">
+      <p class="sidebar-brand">Docs</p>
+      <a class="sidebar-create" href="/blog">Create</a>
+    </div>
+
+    <label class="sidebar-search-wrap" for="sidebar-search">
+      <span class="sr-only">Search</span>
+      <input id="sidebar-search" type="search" placeholder="Search..." class="sidebar-search" />
+    </label>
+
+    <div class="sidebar-content">
+      {groups.map((group) => (
+        <section class="sidebar-group">
+          <p class="sidebar-group-label">{group.label}</p>
+          <ul class="sidebar-menu">
+            {group.items.map((item, idx) => (
+              <li>
+                <a class:list={["sidebar-link", { active: group.label === "Components" && item === "Sidebar" && idx === 10 }]} href="/blog">
+                  {item}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+
+    <div class="sidebar-footer">
+      <p class="meta-chip">109k users</p>
+      <button class="sidebar-theme" type="button">Toggle theme</button>
+    </div>
+  </div>
+</aside>

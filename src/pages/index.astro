@@ -1,241 +1,180 @@
----
+﻿---
 export const prerender = false;
 
+import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 
 import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+
+import image1 from "../assets/blog-placeholder-1.jpg";
+import image2 from "../assets/blog-placeholder-2.jpg";
+import image3 from "../assets/blog-placeholder-3.jpg";
+import image4 from "../assets/blog-placeholder-4.jpg";
+import image5 from "../assets/blog-placeholder-5.jpg";
 
 const featuredBlogs = (await getCollection("blog"))
   .filter((entry) => !entry.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+  .slice(0, 6);
 
 const testimonials = [
   {
-    quote: "The weekly trend brief helps our team move before competitors do.",
+    quote: "The strongest SaaS publication for strategic product context.",
     name: "Mina Patel",
     role: "Product Lead",
   },
   {
-    quote: "Simple dashboard, clear summaries, and zero noise. Exactly what SaaS teams need.",
+    quote: "Dense, practical, and always useful in roadmap review meetings.",
     name: "Jonas Weber",
     role: "Growth Engineer",
   },
   {
-    quote: "We now spot market shifts early and align roadmap updates in one meeting.",
+    quote: "Feels like an analyst report, not a content farm article.",
     name: "Asha Raman",
     role: "Founder",
   },
 ];
 
-const homeJsonLd = [
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    url: new URL("/", Astro.url).toString(),
-  },
-  ...featuredBlogs.map((entry) => ({
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: entry.data.title,
-    description: entry.data.description,
-    url: new URL(`/blog/${entry.id}/`, Astro.url).toString(),
-    datePublished: entry.data.pubDate.toISOString(),
-  })),
-];
+const homeJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  url: new URL("/", Astro.url).toString(),
+};
+
+const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, image4, image2];
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead
-      title={SITE_TITLE}
-      description={SITE_DESCRIPTION}
-      jsonLd={homeJsonLd}
-    />
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} jsonLd={homeJsonLd} />
   </head>
-  <body class="bg-[#f6f8fc] text-[#0f172a]" style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;">
-    <main class="min-h-screen">
-      <header class="border-b border-[#dbe3f1] bg-white">
-        <nav class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-6">
-          <a href="/" class="text-lg font-semibold text-[#0f172a] no-underline">TrendFlow</a>
-          <div class="hidden items-center gap-8 text-sm text-[#334155] md:flex">
-            <a class="no-underline" href="#features">Features</a>
-            <a class="no-underline" href="#blogs">Blogs</a>
-            <a class="no-underline" href="#testimonials">Testimonials</a>
-            <a class="no-underline" href="#cta">Pricing</a>
-          </div>
-          <a
-            href="#cta"
-            class="rounded-md bg-[#2563eb] px-4 py-2 text-sm font-semibold text-white no-underline"
-          >
-            catch up
-          </a>
-        </nav>
-      </header>
+  <body>
+    <Header />
 
-      <section class="mx-auto w-full max-w-6xl px-4 py-14 md:px-6 md:py-20" id="features">
-        <div class="grid items-center gap-10 md:grid-cols-[1.2fr_0.8fr]">
-          <div>
-            <p class="mb-4 inline-flex rounded-full border border-[#c9d8f8] bg-[#eef4ff] px-3 py-1 text-xs font-medium uppercase tracking-[0.12em] text-[#1d4ed8]">
-              SaaS trend intelligence
-            </p>
-            <h1 class="text-4xl font-semibold leading-tight text-[#0f172a] md:text-6xl">
-              Spot product trends early and ship ahead of the market.
-            </h1>
-            <p class="mt-5 max-w-2xl text-lg text-[#475569]">
-              don't stay behind catch up with trends
-            </p>
-            <div class="mt-8 flex flex-wrap gap-3">
-              <a
-                href="#cta"
-                class="rounded-md bg-[#2563eb] px-5 py-3 text-base font-semibold text-white no-underline"
-              >
-                catch up
-              </a>
-              <a
-                href="#testimonials"
-                class="rounded-md border border-[#d2dcec] bg-white px-5 py-3 text-base font-medium text-[#334155] no-underline"
-              >
-                See feedback
-              </a>
-            </div>
-          </div>
-
-          <aside class="rounded-xl border border-[#dbe3f1] bg-white p-6 shadow-sm">
-            <p class="mb-1 text-sm font-medium text-[#64748b]">Live snapshot</p>
-            <h2 class="mb-5 text-2xl font-semibold text-[#0f172a]">This week in trends</h2>
-            <ul class="space-y-4 text-sm text-[#334155]">
-              <li class="rounded-lg border border-[#e2e8f0] bg-[#f8fbff] p-3">
-                74% teams increasing AI-assisted workflows
-              </li>
-              <li class="rounded-lg border border-[#e2e8f0] bg-[#f8fbff] p-3">
-                Edge-first products saw faster feature release cycles
-              </li>
-              <li class="rounded-lg border border-[#e2e8f0] bg-[#f8fbff] p-3">
-                B2B apps prioritizing analytics-led onboarding
-              </li>
-            </ul>
-          </aside>
-        </div>
-      </section>
-
-      <section id="testimonials" class="mx-auto w-full max-w-6xl px-4 pb-16 md:px-6 md:pb-20">
-        <p class="mb-4 text-sm font-semibold uppercase tracking-[0.12em] text-[#64748b]">Little testimonials</p>
-        <div class="grid gap-4 md:grid-cols-3">
-          {testimonials.map((item) => (
-            <article class="rounded-xl border border-[#dbe3f1] bg-white p-5 shadow-sm">
-              <p class="mb-3 text-sm leading-relaxed text-[#334155]">"{item.quote}"</p>
-              <p class="mb-0 text-sm font-semibold text-[#0f172a]">{item.name}</p>
-              <p class="mb-0 text-xs text-[#64748b]">{item.role}</p>
+    <main>
+      <div class="container">
+        <section class="sheet">
+          <div class="news-grid">
+            <article class="hero-feature">
+              <p class="hero-kicker">Exclusive Coverage • {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+              <h1 class="hero-title">The Final Product Judgment</h1>
+              <p class="hero-sub">
+                In-depth analysis of SaaS platform shifts, pricing pressure, AI tooling adoption, and what this quarter means for teams planning the next release cycle.
+              </p>
+              <div class="hero-actions">
+                <a href="/blog" class="btn-primary">Read Full Dossier</a>
+                <a href="#premium" class="btn-ghost">Unlock Premium</a>
+              </div>
             </article>
-          ))}
-        </div>
-      </section>
 
-      <section id="blogs" class="border-y border-[#dbe3f1] bg-[#f8fbff]">
-        <div class="mx-auto w-full max-w-6xl px-4 py-14 md:px-6">
-          <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p class="mb-2 text-sm font-semibold uppercase tracking-[0.12em] text-[#64748b]">Latest blogs</p>
-              <h2 class="text-3xl font-semibold text-[#0f172a] md:text-4xl">Keep learning with practical insights</h2>
-            </div>
-            <a
-              href="/blog/"
-              class="rounded-md border border-[#d2dcec] bg-white px-4 py-2 text-sm font-medium text-[#334155] no-underline"
-            >
-              View all posts
-            </a>
+            <aside class="mosaic" aria-label="Editorial snapshots">
+              {mosaicImages.map((img) => (
+                <Image src={img} width={320} height={220} alt="Editorial collage image" loading="lazy" />
+              ))}
+            </aside>
           </div>
 
+          <section id="features" class="news-cards">
+            <article class="news-card">
+              <p class="card-meta">Meta Alert</p>
+              <h3>Platform Cost vs AI Velocity</h3>
+              <p>We benchmark how leading SaaS teams trade reliability, inference costs, and time-to-market in 2026.</p>
+              <a class="post-link" href="/blog">Reading Time: 12 Min</a>
+            </article>
+            <article class="news-card">
+              <p class="card-meta">Event Guide</p>
+              <h3>How To Run Weekly Execution Reviews</h3>
+              <p>Templates and rituals for turning noisy metrics into one-page decisions your team can execute quickly.</p>
+              <a class="post-link" href="/blog">Reading Time: 7 Min</a>
+            </article>
+            <article class="news-card">
+              <p class="card-meta">Leak Watch</p>
+              <h3>What Buyers Expect In New SaaS Plans</h3>
+              <p>Signals from pricing-page experiments and enterprise procurement behavior across growth-stage products.</p>
+              <a class="post-link" href="/blog">Reading Time: 9 Min</a>
+            </article>
+          </section>
+        </section>
+
+        <section class="dark-band" id="testimonials">
+          <p class="section-kicker" style="color:#bbbbbb;">Testimonials</p>
+          <h2 class="hero-title">The Art Of SaaS Briefing</h2>
+          <div class="dark-grid">
+            {testimonials.map((item) => (
+              <article class="dark-card">
+                <h4>{item.name}</h4>
+                <p>{item.quote}</p>
+                <p class="meta-chip" style="color:#a5a5a5;">{item.role}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section class="spotlight" id="blogs">
+          <p class="section-kicker">Current Briefings</p>
+          <h2 class="spotlight-title">Character Spotlight</h2>
           {
             featuredBlogs.length === 0 ? (
-              <p class="rounded-xl border border-[#dbe3f1] bg-white p-5 text-[#475569]">
-                No blog posts are published yet.
-              </p>
+              <p class="news-card">No reports published yet.</p>
             ) : (
-              <div class="grid gap-4 md:grid-cols-3">
-                {featuredBlogs.map((entry) => (
-                  <article class="rounded-xl border border-[#dbe3f1] bg-white p-5 shadow-sm">
-                    <p class="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-[#64748b]">
-                      {entry.data.category ?? "Engineering"} · {entry.data.pubDate.toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
-                    <h3 class="mb-2 text-xl font-semibold leading-snug text-[#0f172a]">
-                      <a href={`/blog/${entry.id}/`} class="no-underline">{entry.data.title}</a>
-                    </h3>
-                    <p class="mb-4 text-sm leading-relaxed text-[#475569]">{entry.data.description}</p>
-                    <a href={`/blog/${entry.id}/`} class="text-sm font-medium text-[#2563eb] no-underline">
-                      Read article ->
-                    </a>
+              <div class="char-grid">
+                {featuredBlogs.slice(0, 3).map((entry, idx) => (
+                  <article class="char-card">
+                    <Image
+                      src={entry.data.heroImage ?? mosaicImages[idx]}
+                      width={640}
+                      height={420}
+                      alt={`Cover image for ${entry.data.title}`}
+                      loading="lazy"
+                    />
+                    <div class="body">
+                      <p class="card-meta">{(entry.data.category ?? "Engineering").toUpperCase()}</p>
+                      <h3 class="post-title">{entry.data.title}</h3>
+                      <p>{entry.data.description}</p>
+                      <a class="post-link" href={`/blog/${entry.id}/`}>View Detailed Build</a>
+                    </div>
                   </article>
                 ))}
               </div>
             )
           }
-        </div>
-      </section>
+        </section>
 
-      <section id="cta" class="border-t border-[#dbe3f1] bg-white">
-        <div class="mx-auto flex w-full max-w-6xl flex-col items-start justify-between gap-5 px-4 py-10 md:flex-row md:items-center md:px-6">
+        <section class="stat-row">
+          <article class="stat-cell">
+            <p class="stat-number">250k+</p>
+            <p class="meta-chip">Monthly readers across product, growth, and engineering teams.</p>
+          </article>
+          <article class="stat-cell">
+            <p class="stat-number">1.2k</p>
+            <p class="meta-chip">Comments and reactions on weekly briefings.</p>
+          </article>
+          <article class="stat-cell">
+            <p class="stat-number">100%</p>
+            <p class="meta-chip">Operator-focused, hype-free editorial policy.</p>
+          </article>
+        </section>
+
+        <section class="subscribe-box" id="premium">
           <div>
-            <h2 class="mb-1 text-2xl font-semibold text-[#0f172a]">Ready to move with the market?</h2>
-            <p class="mb-0 text-[#475569]">Join teams using TrendFlow to stay ahead every week.</p>
+            <h3>Subscribe To The Daily DevWire</h3>
+            <p style="margin:8px 0 0;">Exclusive reports, early market data, and premium deep-dives.</p>
           </div>
-          <a
-            href="#features"
-            class="rounded-md bg-[#2563eb] px-5 py-3 text-base font-semibold text-white no-underline"
-          >
-            catch up
-          </a>
-        </div>
-      </section>
-
-      <section id="subscribe" class="border-t border-[#dbe3f1] bg-[#f8fbff]">
-        <div class="mx-auto w-full max-w-6xl px-4 py-12 md:px-6">
-          <div class="rounded-xl border border-[#dbe3f1] bg-white p-6 shadow-sm md:p-8">
-            <h2 class="mb-2 text-3xl font-semibold text-[#0f172a]">Subscribe for weekly trend updates</h2>
-            <p class="mb-0 max-w-2xl text-[#475569]">
-              Get a concise digest of product, engineering, and market shifts in one email each week.
-            </p>
-            <form class="mt-6 flex flex-col gap-3 md:flex-row" method="post" action="/api/newsletter">
-              <label class="sr-only" for="newsletter-email">Email address</label>
-              <input
-                id="newsletter-email"
-                name="email"
-                type="email"
-                required
-                placeholder="name@example.com"
-                class="h-11 flex-1 rounded-md border border-[#d2dcec] bg-white px-4 text-[#0f172a]"
-              />
-              <button
-                type="submit"
-                class="rounded-md bg-[#2563eb] px-5 py-3 text-base font-semibold text-white"
-              >
-                catch up
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <footer class="border-t border-[#dbe3f1] bg-white">
-        <div class="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-6">
-          <div>
-            <p class="mb-1 text-lg font-semibold text-[#0f172a]">TrendFlow</p>
-            <p class="mb-0 text-sm text-[#475569]">SaaS trend intelligence for fast-moving teams.</p>
-          </div>
-          <p class="mb-0 text-xs uppercase tracking-[0.1em] text-[#64748b]">
-            Copyright {new Date().getFullYear()} TrendFlow. All rights reserved.
-          </p>
-        </div>
-      </footer>
+          <form method="post" action="/api/newsletter">
+            <label class="sr-only" for="newsletter-email">Email address</label>
+            <input id="newsletter-email" name="email" type="email" required placeholder="you@company.com" />
+            <button type="submit">Join Premium</button>
+          </form>
+        </section>
+      </div>
     </main>
+
+    <Footer />
   </body>
 </html>
