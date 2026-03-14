@@ -1,81 +1,33 @@
 ---
 export const prerender = false;
 
-import { getCollection, type CollectionEntry } from "astro:content";
-import { hc } from "hono/client";
+import { getCollection } from "astro:content";
 
 import BaseHead from "../components/BaseHead.astro";
-import BlogCard from "../components/BlogCard.astro";
-import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
-import NewsCard from "../components/NewsCard.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
-import type { AppType } from "../lib/server/api";
 
-interface NewsItem {
-  id: number;
-  title: string;
-  sourceUrl: string;
-  contentSummary: string;
-  category: string;
-  publishedAt: string;
-}
-
-type MixedItem =
-  | {
-      kind: "news";
-      value: NewsItem;
-    }
-  | {
-      kind: "blog";
-      value: CollectionEntry<"blog">;
-    };
-
-const latestBlogs = (await getCollection("blog"))
+const featuredBlogs = (await getCollection("blog"))
   .filter((entry) => !entry.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 5);
+  .slice(0, 3);
 
-const rpcClient = hc<AppType>(new URL("/api", Astro.url).toString()) as {
-  news: {
-    $get: (args: {
-      query: { page: string; pageSize: string; category?: string };
-    }) => Promise<Response>;
-  };
-};
-let topNews: NewsItem[] = [];
-let newsError: string | null = null;
-
-try {
-  const response = await rpcClient.news.$get({
-    query: {
-      page: "1",
-      pageSize: "5",
-    },
-  });
-
-  if (!response.ok) {
-    newsError = `News API returned status ${response.status}.`;
-  } else {
-    const payload = (await response.json()) as { data: NewsItem[] };
-    topNews = payload.data;
-  }
-} catch {
-  newsError = "Unable to reach the news API during this request.";
-}
-
-const mixedItems: MixedItem[] = [];
-const totalSlots = Math.max(topNews.length, latestBlogs.length);
-
-for (let i = 0; i < totalSlots; i += 1) {
-  if (topNews[i]) {
-    mixedItems.push({ kind: "news", value: topNews[i] });
-  }
-
-  if (latestBlogs[i]) {
-    mixedItems.push({ kind: "blog", value: latestBlogs[i] });
-  }
-}
+const testimonials = [
+  {
+    quote: "The weekly trend brief helps our team move before competitors do.",
+    name: "Mina Patel",
+    role: "Product Lead",
+  },
+  {
+    quote: "Simple dashboard, clear summaries, and zero noise. Exactly what SaaS teams need.",
+    name: "Jonas Weber",
+    role: "Growth Engineer",
+  },
+  {
+    quote: "We now spot market shifts early and align roadmap updates in one meeting.",
+    name: "Asha Raman",
+    role: "Founder",
+  },
+];
 
 const homeJsonLd = [
   {
@@ -85,14 +37,13 @@ const homeJsonLd = [
     description: SITE_DESCRIPTION,
     url: new URL("/", Astro.url).toString(),
   },
-  ...topNews.map((item) => ({
+  ...featuredBlogs.map((entry) => ({
     "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    headline: item.title,
-    description: item.contentSummary,
-    url: item.sourceUrl,
-    mainEntityOfPage: item.sourceUrl,
-    datePublished: item.publishedAt,
+    "@type": "BlogPosting",
+    headline: entry.data.title,
+    description: entry.data.description,
+    url: new URL(`/blog/${entry.id}/`, Astro.url).toString(),
+    datePublished: entry.data.pubDate.toISOString(),
   })),
 ];
 ---
@@ -106,87 +57,185 @@ const homeJsonLd = [
       jsonLd={homeJsonLd}
     />
   </head>
-  <body>
-    <Header />
-    <main class="mx-auto w-full max-w-6xl px-4 pb-16 pt-8 md:px-6">
-      <section
-        class="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
-      >
-        <p
-          class="mb-3 inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600"
-        >
-          Edge-ready stack · Astro + Hono + D1
-        </p>
-        <h1
-          class="text-3xl font-semibold tracking-tight text-slate-900 md:text-5xl"
-        >
-          Tech News and Developer Blogs, optimized for speed.
-        </h1>
-        <p
-          class="mt-4 max-w-3xl text-base leading-relaxed text-slate-600 md:text-lg"
-        >
-          Read curated engineering headlines and deep technical posts from one
-          edge-first experience. The feed is rendered server-side for search
-          visibility and paired with static Astro content for excellent Core Web
-          Vitals.
-        </p>
-
-        <form
-          class="mt-6 flex flex-col gap-3 sm:flex-row"
-          method="post"
-          action="/api/newsletter"
-        >
-          <label class="sr-only" for="newsletter-email">Email address</label>
-          <input
-            id="newsletter-email"
-            name="email"
-            type="email"
-            required
-            placeholder="your@email.dev"
-            class="h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-slate-500"
-          />
-          <button
-            type="submit"
-            class="h-11 rounded-xl bg-slate-900 px-5 text-sm font-medium text-white transition hover:bg-slate-800"
+  <body class="bg-[#f6f8fc] text-[#0f172a]" style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;">
+    <main class="min-h-screen">
+      <header class="border-b border-[#dbe3f1] bg-white">
+        <nav class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-6">
+          <a href="/" class="text-lg font-semibold text-[#0f172a] no-underline">TrendFlow</a>
+          <div class="hidden items-center gap-8 text-sm text-[#334155] md:flex">
+            <a class="no-underline" href="#features">Features</a>
+            <a class="no-underline" href="#blogs">Blogs</a>
+            <a class="no-underline" href="#testimonials">Testimonials</a>
+            <a class="no-underline" href="#cta">Pricing</a>
+          </div>
+          <a
+            href="#cta"
+            class="rounded-md bg-[#2563eb] px-4 py-2 text-sm font-semibold text-white no-underline"
           >
-            Subscribe to newsletter
-          </button>
-        </form>
+            catch up
+          </a>
+        </nav>
+      </header>
 
-        {newsError && <p class="mt-3 text-sm text-amber-700">{newsError}</p>}
-      </section>
-
-      <section aria-label="Mixed bento feed of news and blogs">
-        {
-          mixedItems.length === 0 ? (
-            <p class="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
-              No content is available yet. Add rows to D1 news or publish more
-              blog posts to populate the feed.
+      <section class="mx-auto w-full max-w-6xl px-4 py-14 md:px-6 md:py-20" id="features">
+        <div class="grid items-center gap-10 md:grid-cols-[1.2fr_0.8fr]">
+          <div>
+            <p class="mb-4 inline-flex rounded-full border border-[#c9d8f8] bg-[#eef4ff] px-3 py-1 text-xs font-medium uppercase tracking-[0.12em] text-[#1d4ed8]">
+              SaaS trend intelligence
             </p>
-          ) : (
-            <div class="grid gap-4 md:auto-rows-[minmax(220px,1fr)] md:grid-cols-4">
-              {mixedItems.map((item, index) => (
-                <div
-                  class:list={[
-                    index === 0
-                      ? "md:col-span-2 md:row-span-2"
-                      : index % 5 === 0
-                        ? "md:col-span-2"
-                        : "md:col-span-1",
-                  ]}
-                >
-                  {item.kind === "news" ? (
-                    <NewsCard item={item.value} featured={index === 0} />
-                  ) : (
-                    <BlogCard entry={item.value} featured={index === 0} />
-                  )}
-                </div>
-              ))}
+            <h1 class="text-4xl font-semibold leading-tight text-[#0f172a] md:text-6xl">
+              Spot product trends early and ship ahead of the market.
+            </h1>
+            <p class="mt-5 max-w-2xl text-lg text-[#475569]">
+              don't stay behind catch up with trends
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+              <a
+                href="#cta"
+                class="rounded-md bg-[#2563eb] px-5 py-3 text-base font-semibold text-white no-underline"
+              >
+                catch up
+              </a>
+              <a
+                href="#testimonials"
+                class="rounded-md border border-[#d2dcec] bg-white px-5 py-3 text-base font-medium text-[#334155] no-underline"
+              >
+                See feedback
+              </a>
             </div>
-          )
-        }
+          </div>
+
+          <aside class="rounded-xl border border-[#dbe3f1] bg-white p-6 shadow-sm">
+            <p class="mb-1 text-sm font-medium text-[#64748b]">Live snapshot</p>
+            <h2 class="mb-5 text-2xl font-semibold text-[#0f172a]">This week in trends</h2>
+            <ul class="space-y-4 text-sm text-[#334155]">
+              <li class="rounded-lg border border-[#e2e8f0] bg-[#f8fbff] p-3">
+                74% teams increasing AI-assisted workflows
+              </li>
+              <li class="rounded-lg border border-[#e2e8f0] bg-[#f8fbff] p-3">
+                Edge-first products saw faster feature release cycles
+              </li>
+              <li class="rounded-lg border border-[#e2e8f0] bg-[#f8fbff] p-3">
+                B2B apps prioritizing analytics-led onboarding
+              </li>
+            </ul>
+          </aside>
+        </div>
       </section>
+
+      <section id="testimonials" class="mx-auto w-full max-w-6xl px-4 pb-16 md:px-6 md:pb-20">
+        <p class="mb-4 text-sm font-semibold uppercase tracking-[0.12em] text-[#64748b]">Little testimonials</p>
+        <div class="grid gap-4 md:grid-cols-3">
+          {testimonials.map((item) => (
+            <article class="rounded-xl border border-[#dbe3f1] bg-white p-5 shadow-sm">
+              <p class="mb-3 text-sm leading-relaxed text-[#334155]">"{item.quote}"</p>
+              <p class="mb-0 text-sm font-semibold text-[#0f172a]">{item.name}</p>
+              <p class="mb-0 text-xs text-[#64748b]">{item.role}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="blogs" class="border-y border-[#dbe3f1] bg-[#f8fbff]">
+        <div class="mx-auto w-full max-w-6xl px-4 py-14 md:px-6">
+          <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p class="mb-2 text-sm font-semibold uppercase tracking-[0.12em] text-[#64748b]">Latest blogs</p>
+              <h2 class="text-3xl font-semibold text-[#0f172a] md:text-4xl">Keep learning with practical insights</h2>
+            </div>
+            <a
+              href="/blog/"
+              class="rounded-md border border-[#d2dcec] bg-white px-4 py-2 text-sm font-medium text-[#334155] no-underline"
+            >
+              View all posts
+            </a>
+          </div>
+
+          {
+            featuredBlogs.length === 0 ? (
+              <p class="rounded-xl border border-[#dbe3f1] bg-white p-5 text-[#475569]">
+                No blog posts are published yet.
+              </p>
+            ) : (
+              <div class="grid gap-4 md:grid-cols-3">
+                {featuredBlogs.map((entry) => (
+                  <article class="rounded-xl border border-[#dbe3f1] bg-white p-5 shadow-sm">
+                    <p class="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-[#64748b]">
+                      {entry.data.category ?? "Engineering"} · {entry.data.pubDate.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </p>
+                    <h3 class="mb-2 text-xl font-semibold leading-snug text-[#0f172a]">
+                      <a href={`/blog/${entry.id}/`} class="no-underline">{entry.data.title}</a>
+                    </h3>
+                    <p class="mb-4 text-sm leading-relaxed text-[#475569]">{entry.data.description}</p>
+                    <a href={`/blog/${entry.id}/`} class="text-sm font-medium text-[#2563eb] no-underline">
+                      Read article ->
+                    </a>
+                  </article>
+                ))}
+              </div>
+            )
+          }
+        </div>
+      </section>
+
+      <section id="cta" class="border-t border-[#dbe3f1] bg-white">
+        <div class="mx-auto flex w-full max-w-6xl flex-col items-start justify-between gap-5 px-4 py-10 md:flex-row md:items-center md:px-6">
+          <div>
+            <h2 class="mb-1 text-2xl font-semibold text-[#0f172a]">Ready to move with the market?</h2>
+            <p class="mb-0 text-[#475569]">Join teams using TrendFlow to stay ahead every week.</p>
+          </div>
+          <a
+            href="#features"
+            class="rounded-md bg-[#2563eb] px-5 py-3 text-base font-semibold text-white no-underline"
+          >
+            catch up
+          </a>
+        </div>
+      </section>
+
+      <section id="subscribe" class="border-t border-[#dbe3f1] bg-[#f8fbff]">
+        <div class="mx-auto w-full max-w-6xl px-4 py-12 md:px-6">
+          <div class="rounded-xl border border-[#dbe3f1] bg-white p-6 shadow-sm md:p-8">
+            <h2 class="mb-2 text-3xl font-semibold text-[#0f172a]">Subscribe for weekly trend updates</h2>
+            <p class="mb-0 max-w-2xl text-[#475569]">
+              Get a concise digest of product, engineering, and market shifts in one email each week.
+            </p>
+            <form class="mt-6 flex flex-col gap-3 md:flex-row" method="post" action="/api/newsletter">
+              <label class="sr-only" for="newsletter-email">Email address</label>
+              <input
+                id="newsletter-email"
+                name="email"
+                type="email"
+                required
+                placeholder="name@example.com"
+                class="h-11 flex-1 rounded-md border border-[#d2dcec] bg-white px-4 text-[#0f172a]"
+              />
+              <button
+                type="submit"
+                class="rounded-md bg-[#2563eb] px-5 py-3 text-base font-semibold text-white"
+              >
+                catch up
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <footer class="border-t border-[#dbe3f1] bg-white">
+        <div class="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-6">
+          <div>
+            <p class="mb-1 text-lg font-semibold text-[#0f172a]">TrendFlow</p>
+            <p class="mb-0 text-sm text-[#475569]">SaaS trend intelligence for fast-moving teams.</p>
+          </div>
+          <p class="mb-0 text-xs uppercase tracking-[0.1em] text-[#64748b]">
+            Copyright {new Date().getFullYear()} TrendFlow. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </main>
-    <Footer />
   </body>
 </html>
