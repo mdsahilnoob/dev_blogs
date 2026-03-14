@@ -8,7 +8,7 @@ import type { NewsRecord } from './db/schema';
 import { newsletterSubscriptions, news } from './db/schema';
 
 type AppEnv = {
-  Bindings: ApiBindings;
+  Bindings: Partial<ApiBindings>;
 };
 
 type SerializedNews = Omit<NewsRecord, 'publishedAt'> & {
