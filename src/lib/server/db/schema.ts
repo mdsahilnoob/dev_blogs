@@ -6,11 +6,15 @@ export const news = sqliteTable(
     id: integer('id').primaryKey({ autoIncrement: true }),
     title: text('title').notNull(),
     sourceUrl: text('source_url').notNull(),
+    sourceName: text('source_name').notNull(),
+    author: text('author'),
     contentSummary: text('content_summary').notNull(),
     category: text('category').notNull(),
+    readingTimeMinutes: integer('reading_time_minutes').notNull().default(1),
     publishedAt: integer('published_at', { mode: 'timestamp_ms' }).notNull(),
   },
   (table) => ({
+    sourceUrlUniqueIdx: uniqueIndex('news_source_url_unique_idx').on(table.sourceUrl),
     categoryIdx: index('news_category_idx').on(table.category),
     publishedAtIdx: index('news_published_at_idx').on(table.publishedAt),
   })

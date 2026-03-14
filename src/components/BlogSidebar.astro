@@ -1,37 +1,20 @@
 ﻿---
-const groups = [
-  {
-    label: "Sections",
-    items: [
-      "Introduction",
-      "Components",
-    ],
-  },
-  {
-    label: "Components",
-    items: [
-      "Accordion",
-      "Alert",
-      "Avatar",
-      "Badge",
-      "Button",
-      "Card",
-      "Chart",
-      "Dialog",
-      "Input",
-      "Pagination",
-      "Sidebar",
-      "Table",
-      "Tabs",
-      "Tooltip",
-      "Typography",
-    ],
-  },
-  {
-    label: "Resources",
-    items: ["Blocks", "Charts", "Directory", "Registry", "MCP Server", "Open in v0"],
-  },
-];
+interface CountItem {
+  name: string;
+  count: number;
+}
+
+interface Props {
+  categories?: CountItem[];
+  sources?: CountItem[];
+}
+
+const {
+  categories = [],
+  sources = [],
+} = Astro.props;
+
+const docsSections = ["Introduction", "Components", "Installation", "Theming", "CLI", "Forms", "Changelog"];
 ---
 
 <aside class="blog-sidebar" aria-label="Blog sidebar">
@@ -47,20 +30,48 @@ const groups = [
     </label>
 
     <div class="sidebar-content">
-      {groups.map((group) => (
-        <section class="sidebar-group">
-          <p class="sidebar-group-label">{group.label}</p>
-          <ul class="sidebar-menu">
-            {group.items.map((item, idx) => (
+      <section class="sidebar-group">
+        <p class="sidebar-group-label">Sections</p>
+        <ul class="sidebar-menu">
+          {docsSections.map((item) => (
+            <li><a class="sidebar-link" href="/blog">{item}</a></li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="sidebar-group">
+        <p class="sidebar-group-label">Categories</p>
+        <ul class="sidebar-menu">
+          {categories.length === 0 ? (
+            <li><span class="sidebar-link">No categories yet</span></li>
+          ) : (
+            categories.map((item) => (
               <li>
-                <a class:list={["sidebar-link", { active: group.label === "Components" && item === "Sidebar" && idx === 10 }]} href="/blog">
-                  {item}
+                <a class="sidebar-link" href={`/blog/?category=${encodeURIComponent(item.name)}`}>
+                  {item.name} ({item.count})
                 </a>
               </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+            ))
+          )}
+        </ul>
+      </section>
+
+      <section class="sidebar-group">
+        <p class="sidebar-group-label">Top Engineering Blogs</p>
+        <ul class="sidebar-menu">
+          {sources.length === 0 ? (
+            <li><span class="sidebar-link">No sources yet</span></li>
+          ) : (
+            sources.map((item) => (
+              <li>
+                <a class="sidebar-link" href={`/blog/?source=${encodeURIComponent(item.name)}`}>
+                  {item.name} ({item.count})
+                </a>
+              </li>
+            ))
+          )}
+        </ul>
+      </section>
     </div>
 
     <div class="sidebar-footer">
