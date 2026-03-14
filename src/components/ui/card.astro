@@ -1,0 +1,15 @@
+---
+interface Props {
+  as?: "article" | "div" | "section";
+  class?: string;
+}
+
+const { as = "article", class: className = "" } = Astro.props;
+const Element = as;
+---
+
+<Element
+  class={`rounded-2xl border border-slate-200/80 bg-white/90 text-slate-900 shadow-sm ring-1 ring-black/[0.02] backdrop-blur-sm ${className}`}
+>
+  <slot />
+</Element>

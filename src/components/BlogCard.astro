@@ -1,0 +1,54 @@
+---
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+
+import fallback from "../assets/blog-placeholder-5.jpg";
+import Badge from "./ui/badge.astro";
+import Card from "./ui/card.astro";
+
+interface Props {
+  entry: CollectionEntry<"blog">;
+  featured?: boolean;
+}
+
+const { entry, featured = false } = Astro.props;
+const hero = entry.data.heroImage ?? fallback;
+const category = entry.data.category ?? "Engineering";
+const publishedLabel = entry.data.pubDate.toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+---
+
+<Card
+  class={`h-full overflow-hidden ${featured ? "border-slate-300 shadow-md" : ""}`}
+>
+  <a href={`/blog/${entry.id}/`} class="block border-b border-slate-100">
+    <Image
+      src={hero}
+      alt={`Blog thumbnail for ${entry.data.title}`}
+      width={1280}
+      height={720}
+      class="h-44 w-full object-cover"
+      loading="lazy"
+    />
+  </a>
+
+  <div class="space-y-3 p-4">
+    <div class="flex items-center justify-between gap-3">
+      <Badge>{category}</Badge>
+      <p class="text-xs text-slate-500">{publishedLabel}</p>
+    </div>
+
+    <h3 class="text-lg font-semibold leading-snug text-slate-900">
+      <a href={`/blog/${entry.id}/`} class="hover:text-slate-700"
+        >{entry.data.title}</a
+      >
+    </h3>
+
+    <p class="text-sm leading-relaxed text-slate-600">
+      {entry.data.description}
+    </p>
+  </div>
+</Card>

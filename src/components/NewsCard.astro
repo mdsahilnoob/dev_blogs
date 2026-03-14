@@ -1,0 +1,81 @@
+---
+import { Image } from "astro:assets";
+
+import placeholder1 from "../assets/blog-placeholder-1.jpg";
+import placeholder2 from "../assets/blog-placeholder-2.jpg";
+import placeholder3 from "../assets/blog-placeholder-3.jpg";
+import placeholder4 from "../assets/blog-placeholder-4.jpg";
+import placeholder5 from "../assets/blog-placeholder-5.jpg";
+import Badge from "./ui/badge.astro";
+import Card from "./ui/card.astro";
+
+interface NewsItem {
+  id: number;
+  title: string;
+  sourceUrl: string;
+  contentSummary: string;
+  category: string;
+  publishedAt: string;
+}
+
+interface Props {
+  item: NewsItem;
+  featured?: boolean;
+}
+
+const { item, featured = false } = Astro.props;
+const category = item.category.toLowerCase();
+const imageMap = {
+  astro: placeholder1,
+  cloudflare: placeholder2,
+  hono: placeholder3,
+  css: placeholder4,
+  mdx: placeholder5,
+};
+const thumbnail = imageMap[category as keyof typeof imageMap] ?? placeholder1;
+const publishedLabel = new Date(item.publishedAt).toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+---
+
+<Card
+  class={`h-full overflow-hidden ${featured ? "border-slate-300 shadow-md" : ""}`}
+>
+  <a
+    href={item.sourceUrl}
+    target="_blank"
+    rel="noreferrer"
+    class="block border-b border-slate-100"
+  >
+    <Image
+      src={thumbnail}
+      alt={`News thumbnail for ${item.title}`}
+      width={1280}
+      height={720}
+      class="h-44 w-full object-cover"
+      loading="lazy"
+    />
+  </a>
+
+  <div class="space-y-3 p-4">
+    <div class="flex items-center justify-between gap-3">
+      <Badge>{item.category}</Badge>
+      <p class="text-xs text-slate-500">{publishedLabel}</p>
+    </div>
+
+    <h3 class="text-lg font-semibold leading-snug text-slate-900">
+      <a
+        href={item.sourceUrl}
+        target="_blank"
+        rel="noreferrer"
+        class="hover:text-slate-700"
+      >
+        {item.title}
+      </a>
+    </h3>
+
+    <p class="text-sm leading-relaxed text-slate-600">{item.contentSummary}</p>
+  </div>
+</Card>

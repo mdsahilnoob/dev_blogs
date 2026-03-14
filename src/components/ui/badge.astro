@@ -1,0 +1,18 @@
+---
+interface Props {
+  tone?: "default" | "outline";
+  class?: string;
+}
+
+const { tone = "outline", class: className = "" } = Astro.props;
+const toneClass =
+  tone === "default"
+    ? "bg-slate-900 text-white border-transparent"
+    : "border-slate-300 bg-slate-50 text-slate-700";
+---
+
+<span
+  class={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide uppercase ${toneClass} ${className}`}
+>
+  <slot />
+</span>
