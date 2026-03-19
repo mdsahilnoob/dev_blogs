@@ -142,6 +142,16 @@ function pickText(value: unknown): string {
     return value;
   }
 
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const picked = pickText(item);
+
+      if (picked) {
+        return picked;
+      }
+    }
+  }
+
   if (typeof value === "object" && value && "#text" in (value as Record<string, unknown>)) {
     return String((value as Record<string, unknown>)["#text"] ?? "");
   }
@@ -152,6 +162,23 @@ function pickText(value: unknown): string {
 function pickLink(value: unknown): string {
   if (typeof value === "string") {
     return value;
+  }
+
+  if (Array.isArray(value)) {
+    const preferred = value.find((item) => {
+      if (!item || typeof item !== "object") {
+        return false;
+      }
+
+      const rel = String((item as Record<string, unknown>)["@_rel"] ?? "");
+      return rel === "" || rel === "alternate";
+    });
+
+    if (preferred) {
+      return pickLink(preferred);
+    }
+
+    return pickLink(value[0]);
   }
 
   if (typeof value === "object" && value) {
@@ -167,6 +194,35 @@ function pickLink(value: unknown): string {
   }
 
   return "";
+}
+
+function pickAuthor(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const picked = pickAuthor(item);
+
+      if (picked) {
+        return picked;
+      }
+    }
+
+    return "";
+  }
+
+  if (typeof value === "object" && value) {
+    const record = value as Record<string, unknown>;
+    const fromName = pickText(record.name);
+
+    if (fromName) {
+      return fromName;
+    }
+  }
+
+  return pickText(value);
 }
 
 function parseFeedEntries(feedXml: string) {
@@ -186,7 +242,7 @@ function parseFeedEntries(feedXml: string) {
     return asArray(parsed.feed.entry).map((entry: Record<string, unknown>) => ({
       title: pickText(entry.title),
       link: pickLink(entry.link),
-      author: pickText(entry.author),
+      author: pickAuthor(entry.author),
       summary: pickText(entry.summary ?? entry.content),
       publishedAt: pickText(entry.updated ?? entry.published),
     }));
@@ -222,6 +278,7 @@ function toEngineeringNewsItem(
 
 async function fetchFeed(feed: EngineeringFeed, maxPerFeed: number) {
   const response = await fetch(feed.url, {
+    signal: AbortSignal.timeout(10000),
     headers: {
       "user-agent": "DevWireTimesAggregator/1.0",
       accept: "application/rss+xml, application/xml, text/xml",
