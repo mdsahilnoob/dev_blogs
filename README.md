@@ -19,6 +19,7 @@ V1 upcoming features:
 - Blog content, for all types of tech content
 - Image hosting cloudflare R2
 - Dark mode
+- Read time
 
 
 ## 🚀 Project Structure
