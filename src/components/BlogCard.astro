@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
 import fallback from "../assets/blog-placeholder-5.jpg";
+import { getReadingTimeMinutes } from "../lib/reading-time";
 import Badge from "./ui/badge.astro";
 import Card from "./ui/card.astro";
 
@@ -14,6 +15,7 @@ interface Props {
 const { entry, featured = false } = Astro.props;
 const hero = entry.data.heroImage ?? fallback;
 const category = entry.data.category ?? "Engineering";
+const readingTimeMinutes = getReadingTimeMinutes(entry.body ?? "");
 const publishedLabel = entry.data.pubDate.toLocaleDateString("en-US", {
   month: "short",
   day: "numeric",
@@ -38,7 +40,7 @@ const publishedLabel = entry.data.pubDate.toLocaleDateString("en-US", {
   <div class="space-y-3 p-4">
     <div class="flex items-center justify-between gap-3">
       <Badge>{category}</Badge>
-      <p class="text-xs text-slate-500">{publishedLabel}</p>
+      <p class="text-xs text-slate-500">{publishedLabel} | {readingTimeMinutes} min read</p>
     </div>
 
     <h3 class="text-lg font-semibold leading-snug text-slate-900">
