@@ -62,49 +62,50 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
         <section class="sheet">
           <div class="news-grid">
             <article class="hero-feature">
-              <p class="hero-kicker">Exclusive Coverage • {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
-              <h1 class="hero-title">The Final Product Judgment</h1>
+              <p class="hero-kicker">Editor&apos;s Brief • {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+              <h1 class="hero-title">Engineering News For Teams That Ship</h1>
               <p class="hero-sub">
-                In-depth analysis of SaaS platform shifts, pricing pressure, AI tooling adoption, and what this quarter means for teams planning the next release cycle.
+                Daily reporting on architecture, AI tooling, platform reliability, and product execution from leading engineering organizations.
               </p>
               <div class="hero-actions">
-                <a href="/blog" class="btn-primary" aria-label="Read the full engineering reports dossier">Read Full Dossier</a>
-                <a href="#premium" class="btn-ghost" aria-label="Jump to premium subscription section">Unlock Premium</a>
+                <a href="/blog" class="btn-primary" aria-label="Browse all engineering reports">Read Latest Reports</a>
+                <a href="#premium" class="btn-ghost" aria-label="Jump to newsletter subscription">Get Daily Brief</a>
               </div>
             </article>
 
             <aside class="mosaic" aria-label="Editorial snapshots">
               {mosaicImages.map((img) => (
-                <Image src={img} width={320} height={220} alt="Editorial collage image" loading="lazy" />
+                <Image src={img} width={320} height={220} alt="" loading="lazy" aria-hidden="true" />
               ))}
             </aside>
           </div>
 
-          <section id="features" class="news-cards">
+          <section id="features" class="news-cards" aria-labelledby="featured-analyses-title">
+            <h2 id="featured-analyses-title" class="sr-only">Featured analyses</h2>
             <article class="news-card">
-              <p class="card-meta">Meta Alert</p>
-              <h3>Platform Cost vs AI Velocity</h3>
-              <p>We benchmark how leading SaaS teams trade reliability, inference costs, and time-to-market in 2026.</p>
-              <a class="post-link" href="/blog" aria-label="Read report on platform cost versus AI velocity">Reading Time: 12 Min</a>
+              <p class="card-meta">Editorial Analysis</p>
+              <h3>Platform Cost vs. AI Delivery Speed</h3>
+              <p>How engineering leaders balance inference cost, latency, and release cadence across modern SaaS stacks.</p>
+              <a class="post-link" href="/blog" aria-label="Read analysis on platform cost and AI delivery speed">Read Analysis</a>
             </article>
             <article class="news-card">
-              <p class="card-meta">Event Guide</p>
-              <h3>How To Run Weekly Execution Reviews</h3>
-              <p>Templates and rituals for turning noisy metrics into one-page decisions your team can execute quickly.</p>
-              <a class="post-link" href="/blog" aria-label="Read report on weekly execution reviews">Reading Time: 7 Min</a>
+              <p class="card-meta">Execution Guide</p>
+              <h3>How High-Performing Teams Run Weekly Reviews</h3>
+              <p>A practical briefing for turning dashboards into decisions, owners, and measurable follow-through.</p>
+              <a class="post-link" href="/blog" aria-label="Read guide on engineering execution reviews">Read Guide</a>
             </article>
             <article class="news-card">
-              <p class="card-meta">Leak Watch</p>
-              <h3>What Buyers Expect In New SaaS Plans</h3>
-              <p>Signals from pricing-page experiments and enterprise procurement behavior across growth-stage products.</p>
-              <a class="post-link" href="/blog" aria-label="Read report on SaaS buyer expectations">Reading Time: 9 Min</a>
+              <p class="card-meta">Market Signal</p>
+              <h3>What Enterprise Buyers Now Expect From SaaS Plans</h3>
+              <p>Patterns from packaging tests, procurement conversations, and renewal behavior in 2026.</p>
+              <a class="post-link" href="/blog" aria-label="Read market signal report on SaaS buyer expectations">Read Report</a>
             </article>
           </section>
         </section>
 
-        <section class="dark-band" id="testimonials">
+        <section class="dark-band" id="testimonials" aria-labelledby="reader-feedback-title">
           <p class="section-kicker" style="color:#bbbbbb;">Testimonials</p>
-          <h2 class="hero-title">The Art Of SaaS Briefing</h2>
+          <h2 id="reader-feedback-title" class="hero-title">Trusted By Product And Engineering Leaders</h2>
           <div class="dark-grid">
             {testimonials.map((item) => (
               <article class="dark-card">
@@ -116,9 +117,9 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
           </div>
         </section>
 
-        <section class="spotlight" id="blogs">
+        <section class="spotlight" id="blogs" aria-labelledby="latest-briefings-title">
           <p class="section-kicker">Current Briefings</p>
-          <h2 class="spotlight-title">Character Spotlight</h2>
+          <h2 id="latest-briefings-title" class="spotlight-title">Latest From The Newsroom</h2>
           {
             featuredBlogs.length === 0 ? (
               <p class="news-card">No reports published yet.</p>
@@ -137,7 +138,7 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
                       <p class="card-meta">{(entry.data.category ?? "Engineering").toUpperCase()}</p>
                       <h3 class="post-title">{entry.data.title}</h3>
                       <p>{entry.data.description}</p>
-                      <a class="post-link" href={`/blog/${entry.id}/`}>View Detailed Build</a>
+                      <a class="post-link" href={`/blog/${entry.id}/`} aria-label={`Open report: ${entry.data.title}`}>Read Report</a>
                     </div>
                   </article>
                 ))}
@@ -163,13 +164,13 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
 
         <section class="subscribe-box" id="premium">
           <div>
-            <h3>Subscribe To The Daily DevWire</h3>
-            <p style="margin:8px 0 0;">Exclusive reports, early market data, and premium deep-dives.</p>
+            <h3>Subscribe To The Daily Engineering Brief</h3>
+            <p id="newsletter-help" style="margin:8px 0 0;">One concise email each weekday with the top engineering stories and analysis.</p>
           </div>
           <form method="post" action="/api/newsletter">
             <label class="sr-only" for="newsletter-email">Email address</label>
-            <input id="newsletter-email" name="email" type="email" required placeholder="you@company.com" autocomplete="email" />
-            <button type="submit">Join Premium</button>
+            <input id="newsletter-email" name="email" type="email" required placeholder="you@company.com" autocomplete="email" aria-describedby="newsletter-help" />
+            <button type="submit">Subscribe</button>
           </form>
         </section>
       </div>

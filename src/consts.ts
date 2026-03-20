@@ -3,4 +3,4 @@
 
 export const SITE_TITLE = "DevWire Times";
 export const SITE_DESCRIPTION =
-  "Breaking analysis for SaaS teams: product strategy, developer tooling, and growth intelligence in one newsroom.";
+  "Independent engineering news and analysis on AI, cloud, reliability, and software delivery for modern product teams.";

@@ -14,19 +14,19 @@ const {
   sources = [],
 } = Astro.props;
 
-const docsSections = ["Introduction", "Components", "Installation", "Theming", "CLI", "Forms", "Changelog"];
+const docsSections = ["Top Stories", "AI/ML", "Cloud & DevOps", "Security", "Data Systems", "Web Engineering", "All Reports"];
 ---
 
 <aside class="blog-sidebar" aria-label="Blog sidebar">
   <div class="sidebar-shell">
     <div class="sidebar-header">
-      <p class="sidebar-brand">Docs</p>
-      <a class="sidebar-create" href="/blog">Create</a>
+      <p class="sidebar-brand">DevWire</p>
+      <a class="sidebar-create" href="/blog">Browse</a>
     </div>
 
     <label class="sidebar-search-wrap" for="sidebar-search">
       <span class="sr-only">Search sidebar content</span>
-      <input id="sidebar-search" type="search" placeholder="Search..." class="sidebar-search" autocomplete="off" />
+      <input id="sidebar-search" type="search" placeholder="Search reports..." class="sidebar-search" autocomplete="off" />
     </label>
 
     <div class="sidebar-content">
@@ -43,7 +43,7 @@ const docsSections = ["Introduction", "Components", "Installation", "Theming", "
         <p class="sidebar-group-label" id="sidebar-categories-label">Categories</p>
         <ul class="sidebar-menu">
           {categories.length === 0 ? (
-            <li><span class="sidebar-link">No categories yet</span></li>
+            <li><span class="sidebar-link">No categories available</span></li>
           ) : (
             categories.map((item) => (
               <li>
@@ -60,7 +60,7 @@ const docsSections = ["Introduction", "Components", "Installation", "Theming", "
         <p class="sidebar-group-label" id="sidebar-sources-label">Top Engineering Blogs</p>
         <ul class="sidebar-menu">
           {sources.length === 0 ? (
-            <li><span class="sidebar-link">No sources yet</span></li>
+            <li><span class="sidebar-link">No sources available</span></li>
           ) : (
             sources.map((item) => (
               <li>
