@@ -1,13 +1,10 @@
 ﻿---
 export const prerender = false;
 
-import { Image } from "astro:assets";
-import { getCollection } from "astro:content";
 import BaseHead from "../../components/BaseHead.astro";
 import BlogSidebar from "../../components/BlogSidebar.astro";
 import Footer from "../../components/Footer.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
-import { getReadingTimeMinutes } from "../../lib/reading-time";
 import { getCategorizedEngineeringNews } from "../../lib/server/engineering-news";
 
 const selectedCategory = Astro.url.searchParams.get("category")?.trim() || null;
@@ -21,9 +18,6 @@ const externalPosts = feedData.items.filter((item) => {
   return categoryOk && sourceOk;
 });
 
-const localPosts = (await getCollection("blog"))
-  .filter((entry) => !entry.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>
@@ -88,34 +82,6 @@ const localPosts = (await getCollection("blog"))
             }
           </section>
 
-          <section class="page-head" style="margin-top:12px;">
-            <p class="section-kicker">Internal Editorial</p>
-            <h2 class="page-title" style="font-size:clamp(28px,3vw,40px);">Original DevWire Reports</h2>
-          </section>
-
-          <section class="post-grid">
-            {localPosts.map((post) => (
-              <article class="post-card">
-                {post.data.heroImage && (
-                  <a href={`/blog/${post.id}/`}>
-                    <Image width={720} height={360} src={post.data.heroImage} alt={`Cover image for ${post.data.title}`} loading="lazy" />
-                  </a>
-                )}
-                <div class="post-body">
-                  <p class="card-meta">
-                    {(post.data.category ?? "Engineering").toUpperCase()} | {post.data.pubDate.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })} | {getReadingTimeMinutes(post.body ?? "")} MIN READ
-                  </p>
-                  <h2 class="post-title">{post.data.title}</h2>
-                  <p>{post.data.description}</p>
-                  <a class="post-link" href={`/blog/${post.id}/`}>Read Report</a>
-                </div>
-              </article>
-            ))}
-          </section>
         </section>
       </div>
     </main>
