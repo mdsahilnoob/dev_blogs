@@ -1,0 +1,7 @@
+name = "devwire-times"
+compatibility_date = "2026-03-12"
+
+[[d1_databases]]
+binding = "devwire_db"
+database_name = "devwire-db"
+database_id = "cf607799-075f-43d1-87e3-eb120fe4933e"
