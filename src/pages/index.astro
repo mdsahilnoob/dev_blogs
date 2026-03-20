@@ -57,7 +57,7 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
   <body>
     <Header />
 
-    <main>
+    <main id="main-content">
       <div class="container">
         <section class="sheet">
           <div class="news-grid">
@@ -68,8 +68,8 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
                 In-depth analysis of SaaS platform shifts, pricing pressure, AI tooling adoption, and what this quarter means for teams planning the next release cycle.
               </p>
               <div class="hero-actions">
-                <a href="/blog" class="btn-primary">Read Full Dossier</a>
-                <a href="#premium" class="btn-ghost">Unlock Premium</a>
+                <a href="/blog" class="btn-primary" aria-label="Read the full engineering reports dossier">Read Full Dossier</a>
+                <a href="#premium" class="btn-ghost" aria-label="Jump to premium subscription section">Unlock Premium</a>
               </div>
             </article>
 
@@ -85,19 +85,19 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
               <p class="card-meta">Meta Alert</p>
               <h3>Platform Cost vs AI Velocity</h3>
               <p>We benchmark how leading SaaS teams trade reliability, inference costs, and time-to-market in 2026.</p>
-              <a class="post-link" href="/blog">Reading Time: 12 Min</a>
+              <a class="post-link" href="/blog" aria-label="Read report on platform cost versus AI velocity">Reading Time: 12 Min</a>
             </article>
             <article class="news-card">
               <p class="card-meta">Event Guide</p>
               <h3>How To Run Weekly Execution Reviews</h3>
               <p>Templates and rituals for turning noisy metrics into one-page decisions your team can execute quickly.</p>
-              <a class="post-link" href="/blog">Reading Time: 7 Min</a>
+              <a class="post-link" href="/blog" aria-label="Read report on weekly execution reviews">Reading Time: 7 Min</a>
             </article>
             <article class="news-card">
               <p class="card-meta">Leak Watch</p>
               <h3>What Buyers Expect In New SaaS Plans</h3>
               <p>Signals from pricing-page experiments and enterprise procurement behavior across growth-stage products.</p>
-              <a class="post-link" href="/blog">Reading Time: 9 Min</a>
+              <a class="post-link" href="/blog" aria-label="Read report on SaaS buyer expectations">Reading Time: 9 Min</a>
             </article>
           </section>
         </section>
@@ -168,7 +168,7 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
           </div>
           <form method="post" action="/api/newsletter">
             <label class="sr-only" for="newsletter-email">Email address</label>
-            <input id="newsletter-email" name="email" type="email" required placeholder="you@company.com" />
+            <input id="newsletter-email" name="email" type="email" required placeholder="you@company.com" autocomplete="email" />
             <button type="submit">Join Premium</button>
           </form>
         </section>

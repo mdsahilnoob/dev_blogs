@@ -25,13 +25,13 @@ const docsSections = ["Introduction", "Components", "Installation", "Theming", "
     </div>
 
     <label class="sidebar-search-wrap" for="sidebar-search">
-      <span class="sr-only">Search</span>
-      <input id="sidebar-search" type="search" placeholder="Search..." class="sidebar-search" />
+      <span class="sr-only">Search sidebar content</span>
+      <input id="sidebar-search" type="search" placeholder="Search..." class="sidebar-search" autocomplete="off" />
     </label>
 
     <div class="sidebar-content">
-      <section class="sidebar-group">
-        <p class="sidebar-group-label">Sections</p>
+      <section class="sidebar-group" aria-labelledby="sidebar-sections-label">
+        <p class="sidebar-group-label" id="sidebar-sections-label">Sections</p>
         <ul class="sidebar-menu">
           {docsSections.map((item) => (
             <li><a class="sidebar-link" href="/blog">{item}</a></li>
@@ -39,8 +39,8 @@ const docsSections = ["Introduction", "Components", "Installation", "Theming", "
         </ul>
       </section>
 
-      <section class="sidebar-group">
-        <p class="sidebar-group-label">Categories</p>
+      <section class="sidebar-group" aria-labelledby="sidebar-categories-label">
+        <p class="sidebar-group-label" id="sidebar-categories-label">Categories</p>
         <ul class="sidebar-menu">
           {categories.length === 0 ? (
             <li><span class="sidebar-link">No categories yet</span></li>
@@ -56,8 +56,8 @@ const docsSections = ["Introduction", "Components", "Installation", "Theming", "
         </ul>
       </section>
 
-      <section class="sidebar-group">
-        <p class="sidebar-group-label">Top Engineering Blogs</p>
+      <section class="sidebar-group" aria-labelledby="sidebar-sources-label">
+        <p class="sidebar-group-label" id="sidebar-sources-label">Top Engineering Blogs</p>
         <ul class="sidebar-menu">
           {sources.length === 0 ? (
             <li><span class="sidebar-link">No sources yet</span></li>
@@ -76,7 +76,9 @@ const docsSections = ["Introduction", "Components", "Installation", "Theming", "
 
     <div class="sidebar-footer">
       <p class="meta-chip">109k users</p>
-      <button class="sidebar-theme" type="button">Toggle theme</button>
+      <button class="sidebar-theme" type="button" disabled aria-disabled="true" title="Theme toggle is not available yet">
+        Theme Soon
+      </button>
     </div>
   </div>
 </aside>

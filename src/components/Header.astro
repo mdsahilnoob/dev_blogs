@@ -11,7 +11,8 @@ const tickerItems = [
 ---
 
 <header class="news-header">
-  <div class="ticker" aria-label="Breaking news">
+  <a class="skip-link" href="#main-content">Skip To Content</a>
+  <div class="ticker" aria-label="Breaking news" aria-live="off">
     <div class="ticker-track">
       {tickerItems.concat(tickerItems).map((item) => (
         <span>{item}</span>
@@ -20,7 +21,7 @@ const tickerItems = [
   </div>
 
   <div class="container">
-    <nav class="masthead" aria-label="Primary">
+    <nav class="masthead" aria-label="Primary navigation">
       <a href="/" class="logo">{SITE_TITLE}</a>
       <div class="main-nav">
         <HeaderLink href="/">Latest</HeaderLink>
