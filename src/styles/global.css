@@ -529,25 +529,32 @@ main {
 
 
 .blog-page-layout {
+  width: 100%;
   display: grid;
-  grid-template-columns: 20% 80%;
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: var(--seam-gap);
   align-items: start;
 }
 
 .blog-main {
+  margin-left: 0;
+  width: 100%;
   min-width: 0;
   height: auto;
   overflow: visible;
+  padding: 0 12px;
 }
 
 .blog-sidebar {
+  width: 300px;
   border: 1px solid var(--line-dark);
   background: #fff;
-  align-self: stretch;
-  position: static;
-  top: auto;
-  max-height: none;
+  position: sticky;
+  align-self: start;
+  left: auto;
+  top: 0;
+  height: 100vh;
+  z-index: 10;
   overflow: hidden;
   border-radius: 0;
   box-shadow: none;
@@ -556,7 +563,7 @@ main {
 .sidebar-shell {
   display: grid;
   grid-template-rows: auto auto 1fr auto;
-  min-height: 100%;
+  min-height: 100vh;
 }
 
 .sidebar-header {
@@ -591,7 +598,9 @@ main {
 }
 
 .sidebar-search-wrap {
-  display: block;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--line);
 }
@@ -602,6 +611,17 @@ main {
   background: #fff;
   font-size: 13px;
   padding: 8px 10px;
+}
+
+.sidebar-search-btn {
+  border: 1px solid var(--line-dark);
+  background: #000;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+  padding: 0 10px;
+  min-height: 36px;
 }
 
 .sidebar-content {
@@ -777,6 +797,7 @@ main {
 .btn-ghost:hover,
 .post-link:hover,
 .sidebar-create:hover,
+.sidebar-search-btn:hover,
 .sidebar-theme:hover,
 .footer-grid a:hover {
   background: #f7f7f7;
@@ -784,6 +805,11 @@ main {
 
 .news-btn:hover,
 .btn-primary:hover {
+  background: #1c1c1c;
+  color: #fff;
+}
+
+.sidebar-search-btn:hover {
   background: #1c1c1c;
   color: #fff;
 }
@@ -818,16 +844,26 @@ main {
 
 @media (max-width: 1024px) {
   .blog-page-layout {
+    width: 100%;
     grid-template-columns: 1fr;
     height: auto;
     overflow: visible;
   }
 
   .blog-sidebar {
+    width: 100%;
     position: static;
-    max-height: none;
+    left: auto;
+    top: auto;
+    z-index: auto;
+    min-height: 0;
     height: auto;
+    max-height: none;
     overflow: visible;
+  }
+
+  .sidebar-shell {
+    min-height: 0;
   }
 
   .sidebar-content {
@@ -836,6 +872,9 @@ main {
   }
 
   .blog-main {
+    margin-left: 0;
+    width: 100%;
+    padding: 0;
     height: auto;
     overflow: visible;
   }

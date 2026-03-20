@@ -9,13 +9,16 @@ import { getCategorizedEngineeringNews } from "../../lib/server/engineering-news
 
 const selectedCategory = Astro.url.searchParams.get("category")?.trim() || null;
 const selectedSource = Astro.url.searchParams.get("source")?.trim() || null;
+const searchQuery = Astro.url.searchParams.get("q")?.trim() || null;
 
 const feedData = await getCategorizedEngineeringNews(120);
 
 const externalPosts = feedData.items.filter((item) => {
   const categoryOk = !selectedCategory || item.category.toLowerCase() === selectedCategory.toLowerCase();
   const sourceOk = !selectedSource || item.sourceName.toLowerCase() === selectedSource.toLowerCase();
-  return categoryOk && sourceOk;
+  const searchHaystack = `${item.title} ${item.contentSummary} ${item.sourceName} ${item.category}`.toLowerCase();
+  const searchOk = !searchQuery || searchHaystack.includes(searchQuery.toLowerCase());
+  return categoryOk && sourceOk && searchOk;
 });
 
 ---
@@ -27,8 +30,13 @@ const externalPosts = feedData.items.filter((item) => {
   </head>
   <body>
     <main id="main-content">
-      <div class="container blog-page-layout">
-        <BlogSidebar categories={feedData.categories} sources={feedData.sources} />
+      <div class="blog-page-layout">
+        <BlogSidebar
+          categories={feedData.categories}
+          searchQuery={searchQuery ?? ""}
+          selectedCategory={selectedCategory}
+          selectedSource={selectedSource}
+        />
 
         <section class="blog-main">
           <section class="page-head">
@@ -39,11 +47,12 @@ const externalPosts = feedData.items.filter((item) => {
               Stories are grouped into Web Engineering, Cloud/DevOps, AI/ML, Security, Data Systems, and Infrastructure.
             </p>
             {
-              (selectedCategory || selectedSource) && (
+              (selectedCategory || selectedSource || searchQuery) && (
                 <p class="card-meta" style="margin-top:10px;">
                   Active Filters:
                   {selectedCategory ? ` category=${selectedCategory}` : ""}
                   {selectedSource ? ` source=${selectedSource}` : ""}
+                  {searchQuery ? ` q=${searchQuery}` : ""}
                   <a class="post-link" style="margin-left:8px;" href="/blog">Clear</a>
                 </p>
               )
@@ -56,6 +65,13 @@ const externalPosts = feedData.items.filter((item) => {
                 <article class="post-card">
                   <div class="post-body">
                     <h2 class="post-title">No matching engineering posts found.</h2>
+                    {
+                      searchQuery && (
+                        <p>
+                          Try a different search for <strong>{searchQuery}</strong> or clear filters.
+                        </p>
+                      )
+                    }
                   </div>
                 </article>
               ) : (
