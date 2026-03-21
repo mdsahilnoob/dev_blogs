@@ -2,12 +2,17 @@
 export const prerender = false;
 
 import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import { env } from "cloudflare:workers";
+import { desc, eq } from "drizzle-orm";
 
 import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
-import { getCategorizedEngineeringNews } from "../lib/server/engineering-news";
+import type { ApiBindings } from "../lib/server/db/client";
+import { getDb } from "../lib/server/db/client";
+import { blogs } from "../lib/server/db/schema";
 
 import image1 from "../assets/blog-placeholder-1.jpg";
 import image2 from "../assets/blog-placeholder-2.jpg";
@@ -15,8 +20,35 @@ import image3 from "../assets/blog-placeholder-3.jpg";
 import image4 from "../assets/blog-placeholder-4.jpg";
 import image5 from "../assets/blog-placeholder-5.jpg";
 
-const feedData = await getCategorizedEngineeringNews(30);
-const featuredBlogs = feedData.items.slice(0, 3);
+const fallbackBlogs = (await getCollection("blog"))
+  .filter((entry) => !entry.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3)
+  .map((entry) => ({
+    slug: entry.id,
+    title: entry.data.title,
+    description: entry.data.description,
+    category: entry.data.category ?? "Engineering",
+    publishedAt: entry.data.pubDate,
+  }));
+
+const db = getDb(env as Partial<ApiBindings>);
+const dbBlogs = db
+  ? await db
+      .select({
+        slug: blogs.slug,
+        title: blogs.title,
+        description: blogs.description,
+        category: blogs.category,
+        publishedAt: blogs.publishedAt,
+      })
+      .from(blogs)
+      .where(eq(blogs.isPublished, true))
+      .orderBy(desc(blogs.publishedAt))
+      .limit(3)
+  : [];
+
+const featuredBlogs = dbBlogs.length > 0 ? dbBlogs : fallbackBlogs;
 
 const testimonials = [
   {
@@ -117,7 +149,7 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
 
         <section class="spotlight" id="blogs" aria-labelledby="latest-briefings-title">
           <p class="section-kicker">Current Briefings</p>
-          <h2 id="latest-briefings-title" class="spotlight-title">Latest Engineering Blogs</h2>
+          <h2 id="latest-briefings-title" class="spotlight-title">Latest From The Newsroom</h2>
           {
             featuredBlogs.length === 0 ? (
               <p class="news-card">No reports published yet.</p>
@@ -135,18 +167,20 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
                     />
                     <div class="body">
                       <p class="card-meta">
-                        {entry.category.toUpperCase()} | {entry.sourceName.toUpperCase()} | {entry.readingTimeMinutes} MIN READ
+                        {entry.category.toUpperCase()} | {entry.publishedAt.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
                       </p>
                       <h3 class="post-title">{entry.title}</h3>
-                      <p>{entry.contentSummary}</p>
+                      <p>{entry.description}</p>
                       <a
                         class="post-link"
-                        href={entry.sourceUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={`Read original post: ${entry.title}`}
+                        href={`/blog/${entry.slug}/`}
+                        aria-label={`Read report: ${entry.title}`}
                       >
-                        Read Original
+                        Read Report
                       </a>
                     </div>
                   </article>
