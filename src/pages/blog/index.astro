@@ -1,10 +1,17 @@
 ﻿---
 export const prerender = false;
 
+import { env } from "cloudflare:workers";
+import { desc, eq } from "drizzle-orm";
+
 import BaseHead from "../../components/BaseHead.astro";
 import BlogSidebar from "../../components/BlogSidebar.astro";
 import Footer from "../../components/Footer.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
+import type { ApiBindings } from "../../lib/server/db/client";
+import { getDb } from "../../lib/server/db/client";
+import { FALLBACK_BLOGS } from "../../lib/server/fallback-blogs";
+import { blogs } from "../../lib/server/db/schema";
 import { getCategorizedEngineeringNews } from "../../lib/server/engineering-news";
 
 const selectedCategory = Astro.url.searchParams.get("category")?.trim() || null;
@@ -19,6 +26,32 @@ const externalPosts = feedData.items.filter((item) => {
   const searchHaystack = `${item.title} ${item.contentSummary} ${item.sourceName} ${item.category}`.toLowerCase();
   const searchOk = !searchQuery || searchHaystack.includes(searchQuery.toLowerCase());
   return categoryOk && sourceOk && searchOk;
+});
+
+const db = getDb(env as Partial<ApiBindings>);
+const allBlogs = db
+  ? await db
+      .select({
+        slug: blogs.slug,
+        title: blogs.title,
+        description: blogs.description,
+        category: blogs.category,
+        publishedAt: blogs.publishedAt,
+        tags: blogs.tags,
+      })
+      .from(blogs)
+      .where(eq(blogs.isPublished, true))
+      .orderBy(desc(blogs.publishedAt))
+      .limit(60)
+  : [];
+
+const blogSource = allBlogs.length > 0 ? allBlogs : FALLBACK_BLOGS;
+
+const localBlogs = blogSource.filter((post) => {
+  const categoryOk = !selectedCategory || post.category.toLowerCase() === selectedCategory.toLowerCase();
+  const searchHaystack = `${post.title} ${post.description} ${post.category} ${(post.tags ?? []).join(" ")}`.toLowerCase();
+  const searchOk = !searchQuery || searchHaystack.includes(searchQuery.toLowerCase());
+  return categoryOk && searchOk;
 });
 
 ---
@@ -99,6 +132,40 @@ const externalPosts = feedData.items.filter((item) => {
                       >
                         Read Original
                       </a>
+                    </div>
+                  </article>
+                ))
+              )
+            }
+          </section>
+
+          <section class="page-head" style="margin-top:12px;">
+            <p class="section-kicker">Internal Editorial</p>
+            <h2 class="page-title" style="font-size:clamp(28px,3vw,40px);">Original DevWire Reports</h2>
+          </section>
+
+          <section class="post-grid">
+            {
+              localBlogs.length === 0 ? (
+                <article class="post-card">
+                  <div class="post-body">
+                    <h2 class="post-title">No matching DevWire reports found.</h2>
+                  </div>
+                </article>
+              ) : (
+                localBlogs.map((post) => (
+                  <article class="post-card">
+                    <div class="post-body">
+                      <p class="card-meta">
+                        {post.category.toUpperCase()} | {post.publishedAt.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                      <h2 class="post-title">{post.title}</h2>
+                      <p>{post.description}</p>
+                      <a class="post-link" href={`/blog/${post.slug}/`} aria-label={`Read DevWire report: ${post.title}`}>Read Report</a>
                     </div>
                   </article>
                 ))
