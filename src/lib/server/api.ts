@@ -4,7 +4,6 @@ import { validator } from "hono/validator";
 
 import {
   ENGINEERING_FEEDS,
-  fetchEngineeringNews,
   getCategorizedEngineeringNews,
 } from "./engineering-news";
 import type { ApiBindings } from "./db/client";
@@ -13,9 +12,7 @@ import type { NewsRecord } from "./db/schema";
 import { newsletterSubscriptions, news } from "./db/schema";
 
 type AppEnv = {
-  Bindings: Partial<ApiBindings> & {
-    SYNC_TOKEN?: string;
-  };
+  Bindings: Partial<ApiBindings>;
 };
 
 type SerializedNews = Omit<NewsRecord, "publishedAt"> & {
@@ -151,63 +148,6 @@ app.get(
     });
   }
 );
-
-app.post("/news/sync", async (c) => {
-  const db = getDb(c.env);
-
-  if (!db) {
-    return c.json({ error: 'D1 binding is not available. Expected "DB" or "devwire_db".' }, 503);
-  }
-
-  const syncToken = c.env.SYNC_TOKEN;
-  const providedToken = c.req.header("x-sync-token");
-
-  if (syncToken && providedToken !== syncToken) {
-    return c.json({ error: "Unauthorized sync token." }, 401);
-  }
-
-  try {
-    const fetched = await fetchEngineeringNews(15);
-
-    if (fetched.length === 0) {
-      return c.json({ ok: true, attempted: 0, message: "No items fetched from RSS feeds." });
-    }
-
-    const rows = fetched.map((item) => ({
-      title: item.title,
-      sourceUrl: item.sourceUrl,
-      sourceName: item.sourceName,
-      author: item.author,
-      contentSummary: item.contentSummary,
-      category: item.category,
-      readingTimeMinutes: item.readingTimeMinutes,
-      publishedAt: item.publishedAt,
-    }));
-
-    // Keep batch size small for D1 parameter and payload limits.
-    const batchSize = 10;
-    for (let i = 0; i < rows.length; i += batchSize) {
-      const chunk = rows.slice(i, i + batchSize);
-      await db.insert(news).values(chunk).onConflictDoNothing({ target: news.sourceUrl });
-    }
-
-    return c.json({
-      ok: true,
-      attempted: fetched.length,
-      feeds: ENGINEERING_FEEDS.length,
-      message: "RSS sync completed.",
-    });
-  } catch (error) {
-    return c.json(
-      {
-        ok: false,
-        error: "RSS sync failed.",
-        detail: error instanceof Error ? error.message : "Unknown error",
-      },
-      500
-    );
-  }
-});
 
 app.post("/newsletter", async (c) => {
   const db = getDb(c.env);
