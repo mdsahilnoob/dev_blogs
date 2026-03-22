@@ -32,6 +32,15 @@ const dbBlogs = db
   : [];
 
 const featuredBlogs = dbBlogs.length > 0 ? dbBlogs : fallbackBlogs;
+const newsletterStatus = Astro.url.searchParams.get("newsletter");
+const newsletterMessage =
+  newsletterStatus === "subscribed"
+    ? "Thanks for subscribing. You are on the daily brief."
+    : newsletterStatus === "invalid"
+      ? "Please enter a valid email address."
+      : newsletterStatus === "unavailable"
+        ? "Subscription is temporarily unavailable. Please try again shortly."
+        : null;
 
 const testimonials = [
   {
@@ -202,6 +211,13 @@ const mosaicImages = [
           <div>
             <h3>Subscribe To The Daily Engineering Brief</h3>
             <p id="newsletter-help" style="margin:8px 0 0;">One concise email each weekday with the top engineering stories and analysis.</p>
+            {
+              newsletterMessage && (
+                <p class="meta-chip" style={`display:block;margin:8px 0 0;color:${newsletterStatus === "subscribed" ? "#1f7a1f" : "#b42318"};`}>
+                  {newsletterMessage}
+                </p>
+              )
+            }
           </div>
           <form method="post" action="/api/newsletter">
             <label class="sr-only" for="newsletter-email">Email address</label>

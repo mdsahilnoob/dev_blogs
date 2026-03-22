@@ -6,11 +6,13 @@ import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 
+const siteUrl = process.env.SITE_URL ?? "https://devwire-times.pages.dev";
+
 // https://astro.build/config
 export default defineConfig({
   adapter: cloudflare(),
   output: "server",
-  site: "https://example.com",
+  site: siteUrl,
   integrations: [mdx(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
