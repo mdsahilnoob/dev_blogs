@@ -295,6 +295,13 @@ main {
   border: 1px solid #bbb;
 }
 
+.mosaic img.mosaic-logo {
+  object-fit: contain;
+  padding: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  border-color: var(--line);
+}
+
 .news-cards {
   margin-top: 0;
   display: grid;
@@ -392,6 +399,12 @@ main {
   height: 200px;
   object-fit: cover;
   border-bottom: 1px solid var(--line);
+}
+
+.char-card img.feature-logo {
+  object-fit: contain;
+  padding: 24px;
+  background: linear-gradient(180deg, #fbfbfb 0%, #f2f2f2 100%);
 }
 
 .char-card .body {
@@ -891,6 +904,14 @@ main {
 :root[data-theme="dark"] .theme-toggle-btn:hover {
   background: #202020;
   color: #f4f4f4;
+}
+
+:root[data-theme="dark"] .mosaic img.mosaic-logo {
+  background: linear-gradient(180deg, #1b1b1b 0%, #151515 100%);
+}
+
+:root[data-theme="dark"] .char-card img.feature-logo {
+  background: linear-gradient(180deg, #1f1f1f 0%, #171717 100%);
 }
 
 .subscribe-box input:focus-visible,

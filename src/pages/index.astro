@@ -1,7 +1,6 @@
 ﻿---
 export const prerender = false;
 
-import { Image } from "astro:assets";
 import { env } from "cloudflare:workers";
 import { desc, eq } from "drizzle-orm";
 
@@ -13,12 +12,6 @@ import type { ApiBindings } from "../lib/server/db/client";
 import { getDb } from "../lib/server/db/client";
 import { FALLBACK_BLOGS } from "../lib/server/fallback-blogs";
 import { blogs } from "../lib/server/db/schema";
-
-import image1 from "../assets/blog-placeholder-1.jpg";
-import image2 from "../assets/blog-placeholder-2.jpg";
-import image3 from "../assets/blog-placeholder-3.jpg";
-import image4 from "../assets/blog-placeholder-4.jpg";
-import image5 from "../assets/blog-placeholder-5.jpg";
 
 const fallbackBlogs = FALLBACK_BLOGS.slice(0, 3);
 
@@ -66,7 +59,24 @@ const homeJsonLd = {
   url: new URL("/", Astro.url).toString(),
 };
 
-const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, image4, image2];
+const companyImages = [
+  "https://raw.githubusercontent.com/devicons/devicon/master/icons/google/google-original.svg",
+  "https://raw.githubusercontent.com/devicons/devicon/master/icons/apple/apple-original.svg",
+  "https://raw.githubusercontent.com/devicons/devicon/master/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
+  "https://raw.githubusercontent.com/devicons/devicon/master/icons/cloudflare/cloudflare-original.svg",
+  "https://raw.githubusercontent.com/devicons/devicon/master/icons/github/github-original.svg",
+];
+const mosaicImages = [
+  companyImages[0],
+  companyImages[1],
+  companyImages[2],
+  companyImages[3],
+  companyImages[4],
+  companyImages[0],
+  companyImages[2],
+  companyImages[3],
+  companyImages[1],
+];
 ---
 
 <!doctype html>
@@ -95,7 +105,7 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
 
             <aside class="mosaic" aria-label="Editorial snapshots">
               {mosaicImages.map((img) => (
-                <Image src={img} width={320} height={220} alt="" loading="lazy" aria-hidden="true" />
+                <img class="mosaic-logo" src={img} width="320" height="220" alt="" loading="lazy" aria-hidden="true" />
               ))}
             </aside>
           </div>
@@ -147,14 +157,7 @@ const mosaicImages = [image1, image2, image3, image4, image5, image1, image3, im
               <div class="char-grid">
                 {featuredBlogs.map((entry, idx) => (
                   <article class="char-card">
-                    <Image
-                      src={mosaicImages[idx]}
-                      width={640}
-                      height={420}
-                      alt=""
-                      aria-hidden="true"
-                      loading="lazy"
-                    />
+                    <img class="feature-logo" src={mosaicImages[idx]} width="640" height="420" alt="" aria-hidden="true" loading="lazy" />
                     <div class="body">
                       <p class="card-meta">
                         {entry.category.toUpperCase()} | {entry.publishedAt.toLocaleDateString("en-US", {
