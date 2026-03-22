@@ -7,6 +7,7 @@ import { and, eq } from "drizzle-orm";
 import BlogPost from "../../layouts/BlogPost.astro";
 import type { ApiBindings } from "../../lib/server/db/client";
 import { getDb } from "../../lib/server/db/client";
+import { FALLBACK_BLOGS } from "../../lib/server/fallback-blogs";
 import { blogs } from "../../lib/server/db/schema";
 
 const slug = (Astro.params.slug ?? "").trim();
@@ -17,32 +18,54 @@ if (!slug) {
 
 const db = getDb(env as Partial<ApiBindings>);
 
-if (!db) {
-  return Astro.redirect("/blog");
-}
+const dbPost = db
+  ? (
+      await db
+        .select({
+          slug: blogs.slug,
+          title: blogs.title,
+          description: blogs.description,
+          content: blogs.content,
+          category: blogs.category,
+          tags: blogs.tags,
+          publishedAt: blogs.publishedAt,
+          updatedAt: blogs.updatedAt,
+        })
+        .from(blogs)
+        .where(and(eq(blogs.slug, slug), eq(blogs.isPublished, true)))
+        .limit(1)
+    )[0]
+  : null;
 
-const post = (
-  await db
-    .select({
-      slug: blogs.slug,
-      title: blogs.title,
-      description: blogs.description,
-      content: blogs.content,
-      category: blogs.category,
-      tags: blogs.tags,
-      publishedAt: blogs.publishedAt,
-      updatedAt: blogs.updatedAt,
-    })
-    .from(blogs)
-    .where(and(eq(blogs.slug, slug), eq(blogs.isPublished, true)))
-    .limit(1)
-)[0];
+const fallback = !dbPost ? FALLBACK_BLOGS.find((item) => item.slug === slug) : null;
 
-if (!post) {
+if (!dbPost && !fallback) {
   return new Response("Not found", { status: 404 });
 }
 
-const paragraphs = post.content.replaceAll("\\n", "\n").split(/\n{2,}/).filter(Boolean);
+const post = dbPost ?? {
+  slug: fallback!.slug,
+  title: fallback!.title,
+  description: fallback!.description,
+  content:
+    `${fallback!.title} is a high-leverage engineering subject that directly affects delivery confidence, reliability, and long-term maintainability. ` +
+    `This article presents a practical implementation path, not a theoretical overview, so teams can apply the guidance during active roadmap execution. ` +
+    `The recommended pattern is to establish measurable baselines, sequence work into low-risk increments, and enforce validation gates before broad rollout.\n\n` +
+    `Start with operational clarity: define user-facing risk, identify dependency boundaries, and assign ownership for each failure mode. ` +
+    `Then implement incremental changes with strong observability, contract checks, and targeted performance monitoring on the most sensitive flows. ` +
+    `Use canary exposure and rollback thresholds to protect production while still moving quickly. ` +
+    `When issues appear, incident handling should be predictable because logs, metrics, and release metadata are already aligned.\n\n` +
+    `Over time, this approach compounds. Teams reduce unplanned work, improve cross-team coordination, and make architecture decisions with better evidence. ` +
+    `For this topic, use the summary as your scope anchor: ${fallback!.description} ` +
+    `Convert that scope into explicit acceptance criteria, rollout checkpoints, and post-launch review tasks. ` +
+    `That is how you turn one feature delivery into a repeatable operating capability that scales across products and teams.`,
+  category: fallback!.category,
+  tags: Array.isArray(fallback!.tags) ? fallback!.tags : [],
+  publishedAt: fallback!.publishedAt,
+  updatedAt: fallback!.updatedAt,
+};
+
+const paragraphs = (post.content ?? "").replaceAll("\\n", "\n").split(/\n{2,}/).filter(Boolean);
 ---
 
 <BlogPost

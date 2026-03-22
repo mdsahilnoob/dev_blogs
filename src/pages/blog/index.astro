@@ -10,6 +10,7 @@ import Footer from "../../components/Footer.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 import type { ApiBindings } from "../../lib/server/db/client";
 import { getDb } from "../../lib/server/db/client";
+import { FALLBACK_BLOGS } from "../../lib/server/fallback-blogs";
 import { blogs, news } from "../../lib/server/db/schema";
 
 const selectedCategory = Astro.url.searchParams.get("category")?.trim() || null;
@@ -78,7 +79,30 @@ const allBlogs = db
       .limit(60)
   : [];
 
-const localBlogs = allBlogs.filter((post) => {
+const fallbackBlogs = FALLBACK_BLOGS.map((post) => ({
+  ...post,
+  content:
+    `${post.title} is a strategic frontend topic with direct impact on reliability, delivery speed, and user trust. ` +
+    `Teams that treat this as a repeatable engineering capability outperform teams that handle it as a one-off fix. ` +
+    `A strong implementation starts with a clear baseline, then applies incremental rollout, testing discipline, and incident-ready observability. ` +
+    `The objective is not only shipping a change, but reducing risk while preserving momentum across product and platform teams.\n\n` +
+    `Execution should begin by defining measurable outcomes and explicit constraints. Capture current latency, error rates, and user-impacting regressions before implementation. ` +
+    `Then map dependencies across API contracts, client state, and release pipelines. ` +
+    `Use small pull requests, contract checks, and staged rollout so defects are contained early. ` +
+    `During rollout, verify analytics, monitor key funnels, and keep rollback paths simple and documented. ` +
+    `After release, run a short retrospective to consolidate lessons into standards and templates for future projects.\n\n` +
+    `In practice, this topic intersects architecture, developer experience, and operational maturity. ` +
+    `The most effective teams align on ownership, keep decision records lightweight but consistent, and prioritize maintainability in each iteration. ` +
+    `That means naming conventions, test boundaries, and observability hooks are designed up front instead of patched late. ` +
+    `When this pattern is sustained over multiple releases, teams gain predictable delivery and higher confidence under pressure.\n\n` +
+    `For this report, start from: ${post.description} ` +
+    `Translate that goal into acceptance criteria, rollout checkpoints, and post-launch metrics so the outcome is measurable. ` +
+    `With this approach, you can scale execution across teams without sacrificing quality, and each release becomes a reliable step forward.`,
+}));
+
+const blogSource = allBlogs.length > 0 ? allBlogs : fallbackBlogs;
+
+const localBlogs = blogSource.filter((post) => {
   const categoryOk = !selectedCategory || post.category.toLowerCase() === selectedCategory.toLowerCase();
   const searchHaystack = `${post.title} ${post.description} ${post.category} ${(post.tags ?? []).join(" ")} ${post.content}`.toLowerCase();
   const searchOk = !searchQuery || searchHaystack.includes(searchQuery.toLowerCase());
