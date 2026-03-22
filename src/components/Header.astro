@@ -51,7 +51,7 @@ const tickerItems = [
       });
     };
 
-    const setTheme = (theme) => {
+    const setTheme = (theme: "light" | "dark") => {
       root.dataset.theme = theme;
       localStorage.setItem("theme", theme);
       syncToggleLabels();
