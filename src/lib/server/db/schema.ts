@@ -27,6 +27,7 @@ export const blogs = sqliteTable(
     slug: text('slug').notNull(),
     title: text('title').notNull(),
     description: text('description').notNull(),
+    content: text('content').notNull().default(''),
     heroImage: text('hero_image'),
     tags: text('tags', { mode: 'json' }).$type<string[]>().notNull(),
     category: text('category').notNull(),

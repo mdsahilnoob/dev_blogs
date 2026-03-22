@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS blogs (
   slug TEXT NOT NULL,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
+  content TEXT NOT NULL DEFAULT '',
   hero_image TEXT,
   tags TEXT NOT NULL,
   category TEXT NOT NULL,

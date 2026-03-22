@@ -7,7 +7,6 @@ import { and, eq } from "drizzle-orm";
 import BlogPost from "../../layouts/BlogPost.astro";
 import type { ApiBindings } from "../../lib/server/db/client";
 import { getDb } from "../../lib/server/db/client";
-import { FALLBACK_BLOGS } from "../../lib/server/fallback-blogs";
 import { blogs } from "../../lib/server/db/schema";
 
 const slug = (Astro.params.slug ?? "").trim();
@@ -18,27 +17,32 @@ if (!slug) {
 
 const db = getDb(env as Partial<ApiBindings>);
 
-const post = db
-  ? (
-      await db
-        .select({
-          slug: blogs.slug,
-          title: blogs.title,
-          description: blogs.description,
-          category: blogs.category,
-          tags: blogs.tags,
-          publishedAt: blogs.publishedAt,
-          updatedAt: blogs.updatedAt,
-        })
-        .from(blogs)
-        .where(and(eq(blogs.slug, slug), eq(blogs.isPublished, true)))
-        .limit(1)
-    )[0]
-  : FALLBACK_BLOGS.find((item) => item.slug === slug);
+if (!db) {
+  return Astro.redirect("/blog");
+}
+
+const post = (
+  await db
+    .select({
+      slug: blogs.slug,
+      title: blogs.title,
+      description: blogs.description,
+      content: blogs.content,
+      category: blogs.category,
+      tags: blogs.tags,
+      publishedAt: blogs.publishedAt,
+      updatedAt: blogs.updatedAt,
+    })
+    .from(blogs)
+    .where(and(eq(blogs.slug, slug), eq(blogs.isPublished, true)))
+    .limit(1)
+)[0];
 
 if (!post) {
   return new Response("Not found", { status: 404 });
 }
+
+const paragraphs = post.content.replaceAll("\\n", "\n").split(/\n{2,}/).filter(Boolean);
 ---
 
 <BlogPost
@@ -49,9 +53,7 @@ if (!post) {
   category={post.category}
   tags={Array.isArray(post.tags) ? post.tags : []}
 >
-  <p>{post.description}</p>
-  <p>
-    This report is served from the DevWire D1 database. Extended article body support can be added by
-    storing full markdown/HTML content in the database.
-  </p>
+  {
+    paragraphs.map((paragraph) => <p>{paragraph}</p>)
+  }
 </BlogPost>
