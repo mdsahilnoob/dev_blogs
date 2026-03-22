@@ -43,7 +43,6 @@ The platform focuses on:
 - Styling: Tailwind CSS
 - Syndication: RSS
 - Language and Tooling: TypeScript with Bun
-- CI/CD: GitHub Actions and Wrangler deploy pipeline
 
 ## Intended Users
 
@@ -72,8 +71,6 @@ The platform focuses on:
 Current implementation includes:
 - Production deployment on Cloudflare Workers
 - D1-backed server rendering paths
-- Build/typecheck/test quality gates
-- CI workflow for push and pull request verification
 
 ## Security and Privacy
 
