@@ -1,69 +1,88 @@
-# Astro Starter Kit: Blog
+# DevWire Times
 
-```sh
-bun create astro@latest -- --template blog
-```
+![DevWire Preview](src/assets/sc_pc.jpg)
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+DevWire Times is an open-source engineering news and editorial platform built for product and engineering teams that need fast, practical technical context.
 
-Features:
+It combines:
+- Curated external engineering news
+- Internal long-form editorial reports
+- Search and category filtering
+- RSS distribution
+- Newsletter subscription collection
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and Open Graph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
+## Product Purpose
 
-V1 upcoming features:
-- Blog content, for all types of tech content
-- Image hosting cloudflare R2
-- Dark mode
-- Read time
+DevWire helps teams stay current on modern engineering topics without spending hours across scattered sources.
 
+The platform focuses on:
+- Actionable insights over hype
+- Operationally useful reporting
+- Consistent publishing experience for teams
 
-## 🚀 Project Structure
+## Core Features
 
-Inside of your Astro project, you'll see the following folders and files:
+- Newsroom homepage with featured stories and editorial layout
+- Engineering feed stream from trusted sources
+- Category and source filtering
+- Search across report metadata and content
+- Internal editorial blog section backed by D1
+- Blog detail pages with long-form article content
+- RSS feed for syndication and reader apps
+- Newsletter subscription endpoint and frontend form flow
+- SEO metadata (canonical links, Open Graph, Twitter cards, JSON-LD)
+- Responsive UI and theme support
 
-```text
-├── public/
-├── src/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
-```
+## Tech Stack
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+- Framework: Astro
+- Runtime and Hosting: Cloudflare Workers
+- Database: Cloudflare D1 (SQLite)
+- API Layer: Hono
+- ORM: Drizzle ORM
+- Styling: Tailwind CSS
+- Syndication: RSS
+- Language and Tooling: TypeScript with Bun
+- CI/CD: GitHub Actions and Wrangler deploy pipeline
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Intended Users
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+- Engineering leaders tracking platform and delivery trends
+- Product managers monitoring technical market signals
+- Frontend/backend teams looking for practical implementation patterns
+- Developer advocacy/editorial teams publishing internal reports
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Typical Uses
 
-## 🧞 Commands
+- Daily engineering news review
+- Weekly technical briefings
+- Internal knowledge sharing and editorial publishing
+- Team onboarding into architecture and delivery practices
+- External audience growth via RSS and newsletters
 
-All commands are run from the root of the project, from a terminal:
+## Frontend Experience
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
+- Home: branded landing + featured briefings
+- Blog: combined external news + internal editorial reports
+- Report detail: full read experience for internal long-form posts
+- About: product positioning and publication context
 
-## 👀 Want to learn more?
+## Reliability and Launch Readiness
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Current implementation includes:
+- Production deployment on Cloudflare Workers
+- D1-backed server rendering paths
+- Build/typecheck/test quality gates
+- CI workflow for push and pull request verification
 
-## Credit
+## Security and Privacy
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+- No secrets are stored in repository content
+- Environment bindings are resolved at runtime
+- Newsletter endpoint validates input before persistence
+- Sensitive values should remain in deployment secret storage only
+
+## Notes
+
+- Keep editorial content quality high with clear, specific, and operationally useful writing.
+- Internal blog articles are designed for long-form depth and practical guidance.
