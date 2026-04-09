@@ -114,7 +114,17 @@ const mosaicImages = [
 
             <aside class="mosaic" aria-label="Editorial snapshots">
               {mosaicImages.map((img) => (
-                <img class="mosaic-logo" src={img} width="320" height="220" alt="" loading="lazy" aria-hidden="true" />
+                <img
+                  class="mosaic-logo"
+                  src={img}
+                  width="320"
+                  height="220"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  fetchpriority="low"
+                  aria-hidden="true"
+                />
               ))}
             </aside>
           </div>
@@ -166,7 +176,17 @@ const mosaicImages = [
               <div class="char-grid">
                 {featuredBlogs.map((entry, idx) => (
                   <article class="char-card">
-                    <img class="feature-logo" src={mosaicImages[idx]} width="640" height="420" alt="" aria-hidden="true" loading="lazy" />
+                    <img
+                      class="feature-logo"
+                      src={mosaicImages[idx]}
+                      width="640"
+                      height="420"
+                      alt=""
+                      aria-hidden="true"
+                      loading="lazy"
+                      decoding="async"
+                      fetchpriority="low"
+                    />
                     <div class="body">
                       <p class="card-meta">
                         {entry.category.toUpperCase()} | {entry.publishedAt.toLocaleDateString("en-US", {

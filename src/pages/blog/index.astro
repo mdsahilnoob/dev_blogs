@@ -16,6 +16,13 @@ import { blogs, news } from "../../lib/server/db/schema";
 const selectedCategory = Astro.url.searchParams.get("category")?.trim() || null;
 const selectedSource = Astro.url.searchParams.get("source")?.trim() || null;
 const searchQuery = Astro.url.searchParams.get("q")?.trim() || null;
+const requestedPage = Number.parseInt(
+  Astro.url.searchParams.get("page") ?? "1",
+  10,
+);
+const currentPage =
+  Number.isNaN(requestedPage) || requestedPage < 1 ? 1 : requestedPage;
+const PAGE_SIZE = 24;
 
 const db = getDb(env as Partial<ApiBindings>);
 
@@ -68,7 +75,6 @@ const allBlogs = db
         slug: blogs.slug,
         title: blogs.title,
         description: blogs.description,
-        content: blogs.content,
         category: blogs.category,
         publishedAt: blogs.publishedAt,
         tags: blogs.tags,
@@ -79,42 +85,54 @@ const allBlogs = db
       .limit(60)
   : [];
 
-const fallbackBlogs = FALLBACK_BLOGS.map((post) => ({
-  ...post,
-  content:
-    `${post.title} is a strategic frontend topic with direct impact on reliability, delivery speed, and user trust. ` +
-    `Teams that treat this as a repeatable engineering capability outperform teams that handle it as a one-off fix. ` +
-    `A strong implementation starts with a clear baseline, then applies incremental rollout, testing discipline, and incident-ready observability. ` +
-    `The objective is not only shipping a change, but reducing risk while preserving momentum across product and platform teams.\n\n` +
-    `Execution should begin by defining measurable outcomes and explicit constraints. Capture current latency, error rates, and user-impacting regressions before implementation. ` +
-    `Then map dependencies across API contracts, client state, and release pipelines. ` +
-    `Use small pull requests, contract checks, and staged rollout so defects are contained early. ` +
-    `During rollout, verify analytics, monitor key funnels, and keep rollback paths simple and documented. ` +
-    `After release, run a short retrospective to consolidate lessons into standards and templates for future projects.\n\n` +
-    `In practice, this topic intersects architecture, developer experience, and operational maturity. ` +
-    `The most effective teams align on ownership, keep decision records lightweight but consistent, and prioritize maintainability in each iteration. ` +
-    `That means naming conventions, test boundaries, and observability hooks are designed up front instead of patched late. ` +
-    `When this pattern is sustained over multiple releases, teams gain predictable delivery and higher confidence under pressure.\n\n` +
-    `For this report, start from: ${post.description} ` +
-    `Translate that goal into acceptance criteria, rollout checkpoints, and post-launch metrics so the outcome is measurable. ` +
-    `With this approach, you can scale execution across teams without sacrificing quality, and each release becomes a reliable step forward.`,
-}));
+const fallbackBlogs = FALLBACK_BLOGS;
 
 const blogSource = allBlogs.length > 0 ? allBlogs : fallbackBlogs;
 
 const localBlogs = blogSource.filter((post) => {
   const categoryOk = !selectedCategory || post.category.toLowerCase() === selectedCategory.toLowerCase();
-  const searchHaystack = `${post.title} ${post.description} ${post.category} ${(post.tags ?? []).join(" ")} ${post.content}`.toLowerCase();
+  const searchHaystack = `${post.title} ${post.description} ${post.category} ${(post.tags ?? []).join(" ")}`.toLowerCase();
   const searchOk = !searchQuery || searchHaystack.includes(searchQuery.toLowerCase());
   return categoryOk && searchOk;
 });
+
+const totalResults = externalPosts.length;
+const totalPages = Math.max(1, Math.ceil(totalResults / PAGE_SIZE));
+const page = Math.min(currentPage, totalPages);
+
+const paginatedExternalPosts = externalPosts.slice(
+  Math.max(0, (page - 1) * PAGE_SIZE),
+  Math.max(0, page * PAGE_SIZE),
+);
+
+const hasFilters = Boolean(selectedCategory || selectedSource || searchQuery);
+const previousPage = page > 1 ? page - 1 : null;
+const nextPage = page < totalPages ? page + 1 : null;
+
+function buildPageUrl(targetPage: number) {
+  const params = new URLSearchParams(Astro.url.searchParams);
+
+  if (targetPage <= 1) {
+    params.delete("page");
+  } else {
+    params.set("page", String(targetPage));
+  }
+
+  const query = params.toString();
+  return query ? `/blog?${query}` : "/blog";
+}
 
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={`Reports | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+    <BaseHead
+      title={`Reports | ${SITE_TITLE}`}
+      description={SITE_DESCRIPTION}
+      robots={hasFilters ? "noindex,follow,max-image-preview:large" : "index,follow,max-image-preview:large"}
+      canonical={buildPageUrl(page)}
+    />
   </head>
   <body>
     <main id="main-content">
@@ -149,7 +167,7 @@ const localBlogs = blogSource.filter((post) => {
 
           <section class="post-grid">
             {
-              externalPosts.length === 0 ? (
+              paginatedExternalPosts.length === 0 ? (
                 <article class="post-card">
                   <div class="post-body">
                     <h2 class="post-title">No matching engineering posts found.</h2>
@@ -163,7 +181,7 @@ const localBlogs = blogSource.filter((post) => {
                   </div>
                 </article>
               ) : (
-                externalPosts.map((post) => (
+                paginatedExternalPosts.map((post) => (
                   <article class="post-card">
                     <div class="post-body">
                       <p class="card-meta">
@@ -227,6 +245,28 @@ const localBlogs = blogSource.filter((post) => {
               )
             }
           </section>
+
+          <nav class="page-head" aria-label="Pagination" style="margin-top:12px;">
+            <p class="card-meta">
+              External feed page {page} of {totalPages} | {totalResults} total news items
+            </p>
+            <div class="hero-actions" style="margin-top:10px;">
+              {
+                previousPage ? (
+                  <a class="post-link" href={buildPageUrl(previousPage)} rel="prev">Previous Page</a>
+                ) : (
+                  <span class="post-link" aria-disabled="true" style="opacity:0.45;cursor:not-allowed;">Previous Page</span>
+                )
+              }
+              {
+                nextPage ? (
+                  <a class="post-link" href={buildPageUrl(nextPage)} rel="next">Next Page</a>
+                ) : (
+                  <span class="post-link" aria-disabled="true" style="opacity:0.45;cursor:not-allowed;">Next Page</span>
+                )
+              }
+            </div>
+          </nav>
 
         </section>
       </div>

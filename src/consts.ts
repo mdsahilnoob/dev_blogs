@@ -4,3 +4,5 @@
 export const SITE_TITLE = "DevWire Times";
 export const SITE_DESCRIPTION =
   "Independent engineering news and analysis on AI, cloud, reliability, and software delivery for modern product teams.";
+export const SITE_URL =
+  import.meta.env.SITE ?? "https://devwire-times.pages.dev";

@@ -13,10 +13,10 @@ interface Props {
   type?: "website" | "article";
   publishedTime?: Date | string;
   modifiedTime?: Date | string;
+  robots?: string;
+  canonical?: string | URL;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
-
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 const {
   title,
@@ -25,6 +25,8 @@ const {
   type = "website",
   publishedTime,
   modifiedTime,
+  robots = "index,follow,max-image-preview:large",
+  canonical,
   jsonLd,
 } = Astro.props;
 
@@ -46,6 +48,13 @@ const absoluteImageURL = new URL(
   typeof image === "string" ? image : image.src,
   Astro.url,
 ).toString();
+const canonicalURL =
+  canonical instanceof URL
+    ? canonical.toString()
+    : canonical
+      ? new URL(canonical, Astro.site).toString()
+      : new URL(Astro.url.pathname, Astro.site).toString();
+const absolutePageURL = Astro.url.toString();
 const publishedISO = toISODate(publishedTime);
 const modifiedISO = toISODate(modifiedTime);
 const jsonLdPayload = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
@@ -72,6 +81,9 @@ const jsonLdPayload = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
   href={new URL("rss.xml", Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
+<meta name="robots" content={robots} />
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0b0b0b" media="(prefers-color-scheme: dark)" />
 
 <!-- Font preloads -->
 <link
@@ -99,7 +111,8 @@ const jsonLdPayload = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={type} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={absolutePageURL} />
+<meta property="og:site_name" content={SITE_TITLE} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={absoluteImageURL} />
@@ -112,7 +125,7 @@ const jsonLdPayload = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
+<meta property="twitter:url" content={absolutePageURL} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={absoluteImageURL} />
