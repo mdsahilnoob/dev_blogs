@@ -10,6 +10,7 @@ It combines:
 - Search and category filtering
 - RSS distribution
 - Newsletter subscription collection
+- more coming soon
 
 ## Product Purpose
 
